@@ -160,10 +160,10 @@ Spade_Selection::Spade_Selection(MainWindow *parent)
     QPixmap pix;
     pix.load(":/res/spade_selection.png");
     pix.scaled(81, 81);
-    setFixedSize(81, 81);
+    setFixedSize(84, 83);
     this->setStyleSheet("QPushButton{border:0px;}");
     setIcon(pix);
-    setIconSize(QSize(81, 81));
+    setIconSize(QSize(84, 83));
     this->parent = parent;
 
 }
@@ -185,11 +185,11 @@ void Spade_Selection::mouseReleaseEvent(QMouseEvent *ev){
             this->spade->topLevelWidget();
             //去除铲子之后的按钮标志
             pix.load(":/res/spade_selected");
-            pix.scaled(81, 81);
+            pix.scaled(85, 82);
             //设置不规则图片样式
             this->setStyleSheet("QPushButton{border:0px;}");
             setIcon(pix);
-            setIconSize(QSize(81, 82));
+            setIconSize(QSize(85, 83));
             spade->move(ev->x() + this->x() - 11, ev->y() + this->y() - 70);
             this->spade->show();
             parent->set_select(nullptr, "", this);

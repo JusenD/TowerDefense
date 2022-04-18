@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     droid->move(460, 705);
     droid->show();
 
-    //添加铲子 selection
+
 //    QPixmap pix;
 //    pix.load(":/res/spade_selection.png");
 //    //设置图片固定大小
@@ -92,8 +92,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->spadeButton->setIcon(pix);
 //    //设置图标大小
 //    ui->spadeButton->setIconSize(QSize(81, 81));
+   //添加铲子 selection
     Selection *spade_selection = new Spade_Selection(this);
-    spade_selection->move(960, 70*the_map->get_row() + 9);
+    spade_selection->move(960-1, 70*the_map->get_row() + 9);
+    spade_selection->show();
 
 }
 

@@ -195,16 +195,15 @@ void Witch::add(Block* place){
 void Witch::attack(){
     vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
     bool whether = false;
-    int enemy_x = 0, enemy_y = 0;
+    int target = 0;
     //范围判定,只能攻击一个
     for(int i = 0; i < all_enemy->size(); i++){
         int distance = ((*all_enemy)[i]->x() - this->place->x())*((*all_enemy)[i]->x() - this->place->x())
                 + ((*all_enemy)[i]->y() - this->place->y())*((*all_enemy)[i]->y() - this->place->y());
         if(distance <= range*range){
             (*all_enemy)[i]->health_decrease(damage, 1100);
-            enemy_x = (*all_enemy)[i]->x();
-            enemy_y = (*all_enemy)[i]->y();
             whether = true;
+            target = i;
             break;
         }
     }
@@ -215,6 +214,8 @@ void Witch::attack(){
         movie->start();
         gif->show();
         QTimer::singleShot(300, this, [=](){
+            this->enemy_x = (*all_enemy)[target]->x();
+            this->enemy_y = (*all_enemy)[target]->y();
             bang->show();
             QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
             //设置时间间隔
@@ -237,7 +238,7 @@ void Witch::attack(){
         });
     }
     //递归调用
-    QTimer::singleShot(5000, this, [=](){
+    QTimer::singleShot(3000, this, [=](){
         attack();
     });
 }
@@ -405,7 +406,7 @@ void EvilWizard::die(){
     gif->setMovie(movie);
     movie->start();
     this->place->delete_defender(this);
-    cut_off(gif, 900);
+    cut_off(gif, 800);
     this->~EvilWizard();
 }
 

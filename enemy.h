@@ -30,6 +30,8 @@ public:
     virtual void die() = 0;
     bool is_ground();
     bool is_fly();
+    int get_x();
+    int get_y();
 
 protected:
     //设置生命值

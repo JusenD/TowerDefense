@@ -24,6 +24,14 @@ bool Enemy::is_fly(){ return this->fly; }
 
 bool Enemy::is_ground(){ return this->ground; };
 
+int Enemy::get_x(){
+    return this->x();
+}
+
+int Enemy::get_y(){
+    return this->y();
+}
+
 Daida::Daida(QWidget *parent, Single_Path* path, Map* map)
 {
     this->setParent(parent);
@@ -239,7 +247,7 @@ void Skeleton::move_once(){//3s完成线性的行走
         //设置终止位置
         if(!block_now->empty()){
             //设置时间间隔
-            animation->setDuration(500);
+            animation->setDuration(1000);
             animation2->setDuration(2500);
             x_now = this_path->way[step].x*70 + 50;
             y_now = this_path->way[step].y*70 - 30;
@@ -256,7 +264,7 @@ void Skeleton::move_once(){//3s完成线性的行走
         }
         else{
             //设置时间间隔
-            animation->setDuration(500);
+            animation->setDuration(1500);
             animation2->setDuration(3000);
             x_now = this_path->way[step].x*70;
             y_now = this_path->way[step].y*70 - 30;
@@ -299,7 +307,7 @@ void Skeleton::die(){
     movie->start();
     gif->setMovie(movie);
     gif->show();
-    cut_off(gif, 1600);
+    cut_off(gif, 1400);
     this->~Skeleton();
 }
 

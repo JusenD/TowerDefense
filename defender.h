@@ -49,6 +49,7 @@ class Witch : public Defender{
     bool bounce_out = false;
     QPropertyAnimation *animation1 = nullptr;
     QPropertyAnimation *animation2 = nullptr;
+    int enemy_x = 0, enemy_y = 0;
 public:
     explicit Witch(QWidget *parent);
     int get_cost();
