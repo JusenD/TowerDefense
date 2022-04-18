@@ -19,7 +19,7 @@ public:
     bool empty();
     void delete_defender(Defender* defender);
     void mouseReleaseEvent(QMouseEvent *ev);
-    void enterEvent(QEnterEvent *evnet);
+    void enterEvent(QEvent *evnet);
     void leaveEvent(QEvent *event);
     virtual void paintEvent(QPaintEvent*);
     bool is_grass();

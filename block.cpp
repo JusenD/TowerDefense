@@ -4,6 +4,7 @@
 #include"mainwindow.h"
 #include"selection.h"
 #include<QMouseEvent>
+#include<QDebug>
 
 Block::Block(QWidget *parent, int x, int y)
     : QWidget{parent}
@@ -31,8 +32,8 @@ void Block::mouseReleaseEvent(QMouseEvent *ev){
 }
 
 //绘制即将选中的悬停效果
-void Block::enterEvent(QEnterEvent *event){
-//    qDebug()<<"鼠标进入了！";
+void Block::enterEvent(QEvent *event){
+ //   qDebug()<<"鼠标进入了！";
     if(((MainWindow*)parent)->coming != ""){
         if((type == "Road" && ((MainWindow*)parent)->selected->is_fighter())
                 ||(type == "Grass" && !((MainWindow*)parent)->selected->is_fighter())){

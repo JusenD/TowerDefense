@@ -35,6 +35,6 @@ private:
     bool remove_now = false;
     Ui::MainWindow *ui;
 friend void Block::mouseReleaseEvent(QMouseEvent *ev);
-friend void Block::enterEvent(QEnterEvent *event);
+friend void Block::enterEvent(QEvent *event);
 };
 #endif // MAINWINDOW_H
