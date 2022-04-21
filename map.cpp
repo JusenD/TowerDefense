@@ -37,9 +37,14 @@ void  Map::init(){            //所有地图初始化
     way.push_back(r16);way.push_back(r17);way.push_back(r18);
     way.push_back(r19);way.push_back(r20);way.push_back(r21);
     way.push_back(r22);
+    Single_Path* path = new Single_Path(way);
+    //设置路径1为地面路径
+    path->ground = true;
     //将路径所在处设为1
-    for(int i = 0; i < way.size(); i++){
-        first_map.array[way[i].y * colomn + way[i].x] = 1;
+    if(path->ground){
+        for(int i = 0; i < way.size(); i++){
+            first_map.array[way[i].y * colomn + way[i].x] = 1;  //等于1表示地面路径
+        }
     }
     //设置第二条路经
     vector<coordinate> way2;
@@ -49,13 +54,33 @@ void  Map::init(){            //所有地图初始化
         way2.push_back(*buffer1);
         way2.push_back(*buffer2);
     }
-    for(int i = 0; i < way2.size(); i++){
-        first_map.array[way2[i].y * colomn + way2[i].x] = 1;
-    }
-    Single_Path* path = new Single_Path(way);
     Single_Path* path2 = new Single_Path(way2);
+    path2->ground = true;
+    if(path->ground){
+        for(int i = 0; i < way2.size(); i++){
+            first_map.array[way2[i].y * colomn + way2[i].x] = 1;
+        }
+    }
+    //设置第三条路经
+    vector<coordinate> way3;
+    for(int i = row-1; i >= 0; i--){
+        coordinate *buffer1 = new coordinate(i+3, i);
+        coordinate *buffer2 = new coordinate(i+2, i);
+        way3.push_back(*buffer1);
+        way3.push_back(*buffer2);
+    }
+    Single_Path* path3 = new Single_Path(way3);
+    path3->ground = false;
+    if(path3->ground){
+        for(int i = 0; i < way3.size(); i++){
+            if(!first_map.array[way3[i].y * colomn + way3[i].x])
+            first_map.array[way3[i].y * colomn + way3[i].x] = 2;    //等于2表示飞行路径
+        }
+    }
+
     first_map.path.push_back(*path);
     first_map.path.push_back(*path2);
+    first_map.path.push_back(*path3);
     all.push_back(first_map);
 
     //一张10x10地图
@@ -98,7 +123,7 @@ Map::Map(QWidget* parent, int num){
     QPixmap pix;
     for(int i = 0; i < row; i++){
         for(int j = 0; j < colomn; j++){
-            if(array[i*colomn + j] == 0){         //画草地
+            if(array[i*colomn + j] == 0 || array[i*colomn + j] == 2){         //画草地
                 Grass* a_grass = new Grass(parent, j*70, i*70);
                 a_grass->show();
                 all_block.push_back(a_grass);
@@ -128,15 +153,24 @@ Map::Map(QWidget* parent, int num){
         }
     }
     //画路径起点
-    pix.load(":/res/ice.png");
-    pix.scaled(70, 70);
     for(int i = 0; i < (*path).size(); i++){
+        if((*path)[i].ground){
+            //陆地起点
+            pix.load(":/res/ground_start.png");
+            pix.scaled(70, 70);
+        }
+        else{
+            //飞行起点
+            pix.load(":/res/fly_start.png");
+            pix.scaled(70, 70);
+        }
         QLabel *cover = new QLabel(parent);
         cover->setFixedSize(70, 70);
         cover->move((*path)[i].way[0].x*70, (*path)[i].way[0].y*70);
         cover->setScaledContents(true);
         cover->setPixmap(pix);
         cover->show();
+        all_block[(*path)[i].way[0].y*colomn + (*path)[i].way[0].x]->not_grass();
  //       painter.drawPixmap((*path)[i].way[0].x*70, (*path)[i].way[0].y*70, 70, 70, pix);
     }
 
@@ -212,9 +246,12 @@ void Map::add_enemy(QWidget *parent, int which_path, int who){
             break;
     }
 //    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
-    a_enemy->show();
-    a_enemy->start_move();
-    this->all_enemy.push_back(a_enemy);
+    if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
+        a_enemy->show();
+        a_enemy->start_move();
+        this->all_enemy.push_back(a_enemy);
+    }
+    else a_enemy->~Enemy();
 }
 //添加我方单位
 void Map::add_defender(Block *where, Defender *single_defender){

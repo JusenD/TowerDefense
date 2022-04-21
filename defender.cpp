@@ -370,7 +370,7 @@ void EvilWizard::attack(){
         int distance = (*all_enemy)[i]->block_now->x() - this->place->x();
         if(distance>0 && distance <= range && (*all_enemy)[i]->block_now->y() - this->place->y() < 20
                 && (*all_enemy)[i]->block_now->y() - this->place->y() > -20){
-            (*all_enemy)[i]->health_decrease(damage, 500);
+            (*all_enemy)[i]->health_decrease(damage, 300);
             whether = true;
         }
     }

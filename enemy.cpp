@@ -384,7 +384,7 @@ void Bat::move_once(){//3s完成线性的行走
         //设置终止位置
         if(!block_now->empty()){
             //设置时间间隔
-            animation->setDuration(1000);
+            animation->setDuration(700);
             animation2->setDuration(2000);
             x_now = this_path->way[step].x*70 + 35;
             y_now = this_path->way[step].y*70 - 30;
@@ -401,7 +401,8 @@ void Bat::move_once(){//3s完成线性的行走
         }
         else{
             //设置时间间隔
-            animation->setDuration(800);
+            animation->setDuration(
+                        800);
             animation2->setDuration(1500);
             x_now = this_path->way[step].x*70;
             y_now = this_path->way[step].y*70 - 30;
@@ -440,7 +441,7 @@ void Bat::die(){
     movie->start();
     gif->setMovie(movie);
     gif->show();
-    cut_off(gif, 1200);
+    cut_off(gif, 1100);
     this->~Bat();
 }
 

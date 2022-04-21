@@ -23,6 +23,7 @@ public:
     void leaveEvent(QEvent *event);
     virtual void paintEvent(QPaintEvent*);
     bool is_grass();
+    void not_grass();
 protected:
     QString type = "";
     QWidget* parent;

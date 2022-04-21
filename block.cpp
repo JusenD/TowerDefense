@@ -82,6 +82,8 @@ std::vector<Defender*>* Block::defender_in(){
 
 bool Block::is_grass(){return grass;}
 
+void Block::not_grass(){grass = false;}
+
 Grass::Grass(QWidget* parent, int x, int y)
     : Block{parent, x, y}
 {

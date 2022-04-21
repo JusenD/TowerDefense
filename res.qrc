@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>res/icon.jpg</file>
         <file>res/grass.png</file>
-        <file>res/ice.png</file>
         <file>res/boji.png</file>
         <file>res/menu.png</file>
         <file>res/daida.png</file>
@@ -75,5 +74,7 @@
         <file>res/Droid_no.png</file>
         <file>res/Droid_selected.png</file>
         <file>res/range_circle.png</file>
+        <file>res/fly_start.png</file>
+        <file>res/ground_start.png</file>
     </qresource>
 </RCC>
