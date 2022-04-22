@@ -26,24 +26,24 @@ MainWindow::MainWindow(QWidget *parent)
     //显示资源
     display_source();
     //添加一个敌人
-    the_map->add_enemy(this, 2, Enemy::Daida);
+    the_map->add_enemy(this, 1, Enemy::Daida);
 
     //再添加一堆敌人
 
     QTimer::singleShot(1000, this, [=](){
-        the_map->add_enemy(this, 2, Enemy::Bat);
+        the_map->add_enemy(this, 0, Enemy::Bat);
     });
     QTimer::singleShot(2000, this, [=](){
-        the_map->add_enemy(this, 2, Enemy::Skeleton);
+        the_map->add_enemy(this, 1, Enemy::Skeleton);
     });
     QTimer::singleShot(3000, this, [=](){
-        the_map->add_enemy(this, 2, Enemy::Bat);
+        the_map->add_enemy(this, 0, Enemy::Bat);
     });
     QTimer::singleShot(4000, this, [=](){
-        the_map->add_enemy(this, 2, Enemy::Daida);
+        the_map->add_enemy(this, 1, Enemy::Daida);
     });
     QTimer::singleShot(5000, this, [=](){
-        the_map->add_enemy(this, 2, Enemy::Skeleton);
+        the_map->add_enemy(this, 0, Enemy::Skeleton);
     });
     //尝试添加一个骷髅兵
 //    Daida* a_daida = new Daida(this, &(*the_map->path)[0], the_map);
@@ -56,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    Bat* a_bat = new Bat(this, &(*the_map->path)[0], the_map);
 //    a_bat->start_move();
     the_map->add_enemy(this, 0, Enemy::Bat);
+    //尝试添加黑法师
+//    BlackWitch* a_blackWitch = new BlackWitch(this, 2, the_map);
+//    a_blackWitch->start_move();
+    the_map->add_enemy(this, 2, Enemy::BlackWitch);
 
     //尝试添加收集器
     Droid* a_droid = new Droid(this);

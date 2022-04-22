@@ -232,18 +232,20 @@ int Map::get_colomn(){return colomn;}
 int Map::get_row(){return row;}
 
 //添加敌方单位
-void Map::add_enemy(QWidget *parent, int which_path, int who){
+void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
     Enemy* a_enemy = nullptr;
     switch (who) {
-        case Enemy::Daida:
-            a_enemy = new Daida(parent, &(*this->path)[which_path], this);
-            break;
-        case Enemy::Skeleton:
-            a_enemy = new Skeleton(parent, &(*this->path)[which_path], this);
-            break;
-        case Enemy::Bat:
-            a_enemy = new Bat(parent, &(*this->path)[which_path], this);
-            break;
+    case Enemy::Daida:
+        a_enemy = new Daida(parent, which_path, this, step);
+        break;
+    case Enemy::Skeleton:
+        a_enemy = new Skeleton(parent, which_path, this, step);
+        break;
+    case Enemy::Bat:
+        a_enemy = new Bat(parent, which_path, this, step);
+        break;
+    case Enemy::BlackWitch:
+        a_enemy = new BlackWitch(parent, which_path, this, step);
     }
 //    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
     if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
@@ -253,6 +255,7 @@ void Map::add_enemy(QWidget *parent, int which_path, int who){
     }
     else a_enemy->~Enemy();
 }
+
 //添加我方单位
 void Map::add_defender(Block *where, Defender *single_defender){
     if(source >= single_defender->get_cost()){ 

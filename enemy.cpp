@@ -32,15 +32,16 @@ int Enemy::get_y(){
     return this->y();
 }
 
-Daida::Daida(QWidget *parent, Single_Path* path, Map* map)
+Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
 {
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
-    this->this_path = path;
+    this->this_path = &(*map->path)[which_path];
+    this->step = step ? step : -1;
     this->resize(70, 70);
     this->map = map;
-    x_now = path->way[0].x*70 + 70;
-    y_now = path->way[0].y*70;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70;
     this->move(x_now, y_now);
     this->health = 200;
 }
@@ -174,14 +175,15 @@ void Daida::paintEvent(QPaintEvent *){
 
 
 //骷髅兵
-Skeleton::Skeleton(QWidget *parent, Single_Path* path, Map* map){
+Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
-    this->this_path = path;
+    this->this_path = &(*map->path)[which_path];
+    this->step = step ? step : -1;
     this->resize(60, 90);
     this->map = map;
-    x_now = path->way[0].x*70 + 70;
-    y_now = path->way[0].y*70 - 30;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70 - 30;
     this->move(x_now, y_now);
     this->health = 500;
     //初始化gif
@@ -313,14 +315,15 @@ void Skeleton::die(){
 
 
 //蝙蝠
-Bat::Bat(QWidget *parent, Single_Path* path, Map* map){
+Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
-    this->this_path = path;
+    this->this_path = &(*map->path)[which_path];
+    this->step = step ? step : -1;
     this->resize(70, 100);
     this->map = map;
-    x_now = path->way[0].x*70 + 70;
-    y_now = path->way[0].y*70 - 30;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70 - 30;
     this->move(x_now, y_now);
     this->health = 100;
     //初始化gif
@@ -445,8 +448,132 @@ void Bat::die(){
     this->~Bat();
 }
 
+BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
+    this->setParent(parent);
+    this->parent = (MainWindow*)parent;
+    this->this_path = &(*map->path)[which_path];
+    this->which_path = which_path;
+    this->step = step ? step : -1;
+    this->resize(70, 90);
+    this->map = map;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70 - 20;
+    this->move(x_now, y_now);
+    this->health = 400;
+    //初始化gif
+    gif = new QLabel;
+    gif->setParent(parent);
+    gif->resize(70, 70);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->hide();
+    gif->move(x_now, y_now);
+}
 
+void BlackWitch::start_move(){
+    if(!started) start_call();
+    move_once();
+    //每隔4s进行一次递归，厌战且有召唤能力
+    QTimer::singleShot(4000, this, [=](){
+        if(can_move) start_move();
+    });
+}
 
+void BlackWitch::move_once(){
+    movie = new QMovie(":/res/BlackWitchFly.gif");
+    gif->setMovie(movie);
+    movie->start();
+    gif->show();
+    step++;
+    if(step == this_path->way.size()){
+        can_move = false;
+        emit defeat();
+    }
+    else{
+        block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+        animation = new QPropertyAnimation(this, "geometry");
+        animation2 = new QPropertyAnimation(gif, "geometry");
+        //设置起始位置
+        animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+        animation2->setStartValue(QRect(x_now, y_now, gif->width(), gif->height()));
+        //设置终止位置
+        //设置时间间隔
+        animation->setDuration(2000);
+        animation2->setDuration(4000);
+        x_now = this_path->way[step].x*70;
+        y_now = this_path->way[step].y*70 - 20;
+        //设置结束位置
+        animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+        animation->setEasingCurve(QEasingCurve::Linear);
+        animation->start();
+        animation2->setEndValue(QRect(x_now, y_now, gif->width(), gif->height()));
+        animation2->setEasingCurve(QEasingCurve::Linear);
+        animation2->start();
+    }
+}
+
+void BlackWitch::start_call(){
+    started = true;
+    QTimer::singleShot(7000, this, [=](){
+        movie = new QMovie(":/res/BlackWitchCall.gif");
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
+        //0.3s后召唤蝙蝠
+        QTimer::singleShot(300, this, [=](){
+            this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
+        });
+        QTimer::singleShot(500, this, [=](){
+            movie = new QMovie(":/res/BlackWitchFly.gif");
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+        });
+        start_call();
+    });
+}
+
+void runaaaa(QLabel* gif, int time){
+    QPropertyAnimation *run_away = new QPropertyAnimation(gif, "geometry");
+    run_away->setStartValue(QRect(gif->x(), gif->y(), gif->width(), gif->height()));
+    run_away->setDuration(1000);
+    run_away->setEasingCurve(QEasingCurve::InQuint);
+    run_away->setEndValue(QRect(gif->x(), -300, gif->width(), gif->height()));
+    QTimer::singleShot(time, [=](){
+        run_away->start();
+    });
+}
+
+void BlackWitch::die(){
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    vector<Enemy*>::iterator itor = map->all_enemy.begin();
+    for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
+        if(*itor == this){
+            itor = map->all_enemy.erase(itor);
+            break;
+        }
+    }
+    movie = new QMovie(":/res/BlackWitchDead.gif");
+    movie->start();
+    gif->resize(178, 252);
+    gif->move(x_now - 48, y_now - 10 -162);
+    gif->setMovie(movie);
+    gif->show();
+    //设置逃离动画
+    runaaaa(gif, 700);
+    cut_off(gif, 2200);
+    this->~BlackWitch();
+}
+
+void BlackWitch::stop_move(){
+
+}
+
+void BlackWitch::attack(){
+
+}
 
 
 

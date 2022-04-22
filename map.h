@@ -48,7 +48,7 @@ public:
     vector<Single_Path>* path;
     vector<Enemy*> all_enemy;
     vector<Block*> all_block;
-    void add_enemy(QWidget *parent, int which_path, int who);
+    void add_enemy(QWidget *parent, int which_path, int who, int step = 0);
     void add_defender(Block* where, Defender* single_defender);
     int *array;
     //资源系统

@@ -76,5 +76,8 @@
         <file>res/range_circle.png</file>
         <file>res/fly_start.png</file>
         <file>res/ground_start.png</file>
+        <file>res/BlackWitchCall.gif</file>
+        <file>res/BlackWitchFly.gif</file>
+        <file>res/BlackWitchDead.gif</file>
     </qresource>
 </RCC>

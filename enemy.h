@@ -13,7 +13,7 @@ class Enemy : public QWidget
     Q_OBJECT
 public:
     //枚举所有敌人种类
-    enum Enemies{Daida, Skeleton, Bat};
+    enum Enemies{Daida, Skeleton, Bat, BlackWitch};
     //当前位置
     int x_now;
     int y_now;
@@ -65,7 +65,7 @@ public:
 
 class Daida:public Ground_Enemy{
 public:
-    explicit Daida(QWidget *parent, Single_Path* path, Map* map);
+    explicit Daida(QWidget *parent, int which_path, Map* map, int step = 0);
     void paintEvent(QPaintEvent*);
     void start_move();
     void stop_move();
@@ -76,7 +76,7 @@ public:
 
 class Skeleton: public Ground_Enemy{
 public:
-    explicit Skeleton(QWidget *parent, Single_Path* path, Map* map);
+    explicit Skeleton(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
     void stop_move();
     void move_once();
@@ -90,7 +90,7 @@ public:
 
 class Bat: public Fly_Enemy{
 public:
-    explicit Bat(QWidget *parent, Single_Path* path, Map* map);
+    explicit Bat(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
     void stop_move();
     void move_once();
@@ -100,6 +100,23 @@ public:
     QMovie* movie = nullptr;
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
+};
+
+class BlackWitch : public Fly_Enemy{
+public:
+    explicit BlackWitch(QWidget *parent, int which_path, Map* map, int step = 0);
+    void start_move();
+    void stop_move();
+    void move_once();
+    void attack();
+    void start_call();
+    void die();
+    QLabel* gif = nullptr;
+    QMovie* movie = nullptr;
+    QPropertyAnimation* animation = nullptr;
+    QPropertyAnimation* animation2 = nullptr;
+    int which_path = 0;
+    bool started = false;
 };
 
 #endif // ENEMY_H
