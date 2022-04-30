@@ -35,6 +35,10 @@ void Defender::die(){
     this->~Defender();
 }
 
+void Defender::stop(){
+    this->unfinished = false;
+}
+
 bool Defender::is_fighter(){
     return fighter;
 }
@@ -193,54 +197,56 @@ void Witch::add(Block* place){
 }
 
 void Witch::attack(){
-    vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
-    bool whether = false;
-    int target = 0;
-    //范围判定,只能攻击一个
-    for(int i = 0; i < all_enemy->size(); i++){
-        int distance = ((*all_enemy)[i]->x() - this->place->x())*((*all_enemy)[i]->x() - this->place->x())
-                + ((*all_enemy)[i]->y() - this->place->y())*((*all_enemy)[i]->y() - this->place->y());
-        if(distance <= range*range){
-            (*all_enemy)[i]->health_decrease(damage, 1100);
-            whether = true;
-            target = i;
-            break;
+    if(unfinished){
+        vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
+        bool whether = false;
+        int target = 0;
+        //范围判定,只能攻击一个
+        for(int i = 0; i < all_enemy->size(); i++){
+            int distance = ((*all_enemy)[i]->x() - this->place->x())*((*all_enemy)[i]->x() - this->place->x())
+                    + ((*all_enemy)[i]->y() - this->place->y())*((*all_enemy)[i]->y() - this->place->y());
+            if(distance <= range*range){
+                (*all_enemy)[i]->health_decrease(damage, 1100);
+                whether = true;
+                target = i;
+                break;
+            }
         }
-    }
-    if(whether){
-        //执行攻击动画
-        QMovie* movie = new QMovie(":/res/attack.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
-        QTimer::singleShot(300, this, [=](){
-            this->enemy_x = (*all_enemy)[target]->x();
-            this->enemy_y = (*all_enemy)[target]->y();
-            bang->show();
-            QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
-            //设置时间间隔
-            animation->setDuration(800);
-            //设置起始位置
-            animation->setStartValue(QRect(bang->x(), bang->y(), bang->width(), bang->height()));
-            //设置结束位置
-            animation->setEndValue(QRect(enemy_x + 15, enemy_y + 25, bang->width(), bang->height()));
-            animation->setEasingCurve(QEasingCurve::InCubic);
-            animation->start();
-            QTimer::singleShot(850, this, [=](){
-                bang->hide();
-                bang->move(place->x()+35, place->y()-10);
-            });
-        });
-        QTimer::singleShot(700, this, [=](){
-            QMovie* movie = new QMovie(":/res/wait.gif");
+        if(whether){
+            //执行攻击动画
+            QMovie* movie = new QMovie(":/res/attack.gif");
             gif->setMovie(movie);
             movie->start();
+            gif->show();
+            QTimer::singleShot(300, this, [=](){
+                this->enemy_x = (*all_enemy)[target]->x();
+                this->enemy_y = (*all_enemy)[target]->y();
+                bang->show();
+                QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
+                //设置时间间隔
+                animation->setDuration(800);
+                //设置起始位置
+                animation->setStartValue(QRect(bang->x(), bang->y(), bang->width(), bang->height()));
+                //设置结束位置
+                animation->setEndValue(QRect(enemy_x + 15, enemy_y + 25, bang->width(), bang->height()));
+                animation->setEasingCurve(QEasingCurve::InCubic);
+                animation->start();
+                QTimer::singleShot(850, this, [=](){
+                    bang->hide();
+                    bang->move(place->x()+35, place->y()-10);
+                });
+            });
+            QTimer::singleShot(700, this, [=](){
+                QMovie* movie = new QMovie(":/res/wait.gif");
+                gif->setMovie(movie);
+                movie->start();
+            });
+        }
+        //递归调用
+        QTimer::singleShot(3000, this, [=](){
+            attack();
         });
     }
-    //递归调用
-    QTimer::singleShot(3000, this, [=](){
-        attack();
-    });
 }
 
 //用事件过滤器点击女巫后显示攻击范围
@@ -362,43 +368,45 @@ void EvilWizard::add(Block* place){
 
 //攻击
 void EvilWizard::attack(){
-    vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
-    bool whether = false;
-    //范围判定 可以攻击前方两格内的所有敌人
-    int range = 105;
-    for(int i = 0; i < all_enemy->size(); i++){
-        int distance = (*all_enemy)[i]->block_now->x() - this->place->x();
-        if(distance>0 && distance <= range && (*all_enemy)[i]->block_now->y() - this->place->y() < 20
-                && (*all_enemy)[i]->block_now->y() - this->place->y() > -20){
-            (*all_enemy)[i]->health_decrease(damage, 300);
-            whether = true;
+    if(unfinished){
+        vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
+        bool whether = false;
+        //范围判定 可以攻击前方两格内的所有敌人
+        int range = 105;
+        for(int i = 0; i < all_enemy->size(); i++){
+            int distance = (*all_enemy)[i]->block_now->x() - this->place->x();
+            if(distance>0 && distance <= range && (*all_enemy)[i]->block_now->y() - this->place->y() < 20
+                    && (*all_enemy)[i]->block_now->y() - this->place->y() > -20){
+                (*all_enemy)[i]->health_decrease(damage, 300);
+                whether = true;
+            }
         }
-    }
-    //范围伤害
-    for(int i = 0; i < all_enemy->size(); i++){
-        if((*all_enemy)[i]->block_now == this->place){
-            (*all_enemy)[i]->health_decrease(damage, 500);
-            whether = true;
+        //范围伤害
+        for(int i = 0; i < all_enemy->size(); i++){
+            if((*all_enemy)[i]->block_now == this->place){
+                (*all_enemy)[i]->health_decrease(damage, 500);
+                whether = true;
+            }
         }
-    }
-    //设置攻击频率 为3s一次
-    if(whether){
-        //执行攻击动画
-        movie = new QMovie(":/res/EvilWizardAttack.gif");
-        movie->start();
-        gif->setMovie(movie);
-        gif->show();
-        QTimer::singleShot(1000, this, [=](){
-            movie = new QMovie(":/res/EvilWizardWait.gif");
+        //设置攻击频率 为3s一次
+        if(whether){
+            //执行攻击动画
+            movie = new QMovie(":/res/EvilWizardAttack.gif");
             movie->start();
             gif->setMovie(movie);
             gif->show();
+            QTimer::singleShot(1000, this, [=](){
+                movie = new QMovie(":/res/EvilWizardWait.gif");
+                movie->start();
+                gif->setMovie(movie);
+                gif->show();
+            });
+        }
+        //递归调用
+        QTimer::singleShot(3000, this, [=](){
+            attack();
         });
     }
-    //递归调用
-    QTimer::singleShot(3000, this, [=](){
-        attack();
-    });
 }
 
 void EvilWizard::die(){
@@ -447,21 +455,23 @@ void Droid::add(Block* place){
 }
 
 void Droid::attack(){
-    //执行充能动画
-    QMovie* movie = new QMovie(":/res/DroidAttack.gif");
-    gif->setMovie(movie);
-    movie->start();
-    gif->show();
-    QTimer::singleShot(1100, this, [=](){
-        QMovie* movie = new QMovie(":/res/DroidWait.gif");
+    if(unfinished){
+        //执行充能动画
+        QMovie* movie = new QMovie(":/res/DroidAttack.gif");
         gif->setMovie(movie);
         movie->start();
-        ((MainWindow*)parent)->the_map->add_source(50);
-    });
-    //递归调用
-    QTimer::singleShot(10000, this, [=](){
-        attack();
-    });
+        gif->show();
+        QTimer::singleShot(1100, this, [=](){
+            QMovie* movie = new QMovie(":/res/DroidWait.gif");
+            gif->setMovie(movie);
+            movie->start();
+            ((MainWindow*)parent)->the_map->add_source(50);
+        });
+        //递归调用
+        QTimer::singleShot(10000, this, [=](){
+            attack();
+        });
+    }
 }
 
 void Droid::die(){
@@ -471,6 +481,75 @@ void Droid::die(){
     this->place->delete_defender(this);
     cut_off(gif, 700);
     this->~Droid();
+}
+
+Soildier::Soildier(QWidget *parent)
+    : Defender (parent)
+{
+    this->parent = parent;
+    this->resize(70, 70);
+    this->health = 150;
+    this->damage = 10;
+    this->cost = 0;
+    this->fighter = true;
+}
+
+int Soildier::get_cost(){
+    return this->cost;
+}
+
+void Soildier::add(Block* place, int x_now, int y_now){
+    this->place = place;
+    //装载走路动画
+    gif = new QLabel(parent);
+    gif->setFixedSize(100, 70);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->move(x_now, y_now);
+    movie = new QMovie(":/res/SoildierWalk.gif");
+    gif->setMovie(movie);
+    movie->start();
+    gif->show();
+    //设置移动动画
+    animation1 = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
+    animation1->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+    animation2->setStartValue(QRect(place->x(), place->y(), 100, 70));
+    animation1->setDuration(1000);
+    animation2->setDuration(1000);
+    animation1->start();
+    animation2->start();
+//    this->move(place->x(), place->y());
+    this->show();
+    QTimer::singleShot(1100, this, [=](){
+        this->attack();
+    });
+}
+
+void Soildier::attack(){
+    if(unfinished){
+        //显示等待动画
+        movie = new QMovie(":/res/SoildierWait.gif");
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
+        vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
+            bool whether = false;
+            //只能攻击一个
+            for(int i = 0; i < all_enemy->size(); i++){
+                if((*all_enemy)[i]->block_now == this->place){
+                    if((*all_enemy)[i]->is_ground()){
+                        (*all_enemy)[i]->health_decrease(damage, 260);
+                        whether = true;
+                        break;
+                    }
+                }
+            }
+    }
+}
+
+void Soildier::die(){
+
 }
 
 

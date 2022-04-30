@@ -26,12 +26,14 @@ public:
     virtual void stop_move() = 0;
     virtual void move_once() = 0;
     virtual void attack() = 0;
+    void stop();
     void health_decrease(int n, int time);
     virtual void die() = 0;
     bool is_ground();
     bool is_fly();
     int get_x();
     int get_y();
+    void end();
 
 protected:
     //设置生命值
@@ -43,8 +45,7 @@ protected:
     bool dead = false;
     MainWindow* parent = nullptr;
     Single_Path* this_path = nullptr;
-signals:
-    void defeat();
+    bool unfinished = true;
 };
 
 class Ground_Enemy:public Enemy{
@@ -72,6 +73,11 @@ public:
     void move_once();
     void attack();
     void die();
+    void stop();
+    QPropertyAnimation *animation = nullptr;
+    QPropertyAnimation *animation1 = nullptr;
+    QPropertyAnimation *animation2 = nullptr;
+    QPropertyAnimation *animation3 = nullptr;
 };
 
 class Skeleton: public Ground_Enemy{
@@ -82,6 +88,7 @@ public:
     void move_once();
     void attack();
     void die();
+    void stop();
     QLabel* gif = nullptr;
     QMovie* movie = nullptr;
     QPropertyAnimation* animation = nullptr;
@@ -96,6 +103,7 @@ public:
     void move_once();
     void attack();
     void die();
+    void stop();
     QLabel* gif = nullptr;
     QMovie* movie = nullptr;
     QPropertyAnimation* animation = nullptr;
@@ -111,6 +119,7 @@ public:
     void attack();
     void start_call();
     void die();
+    void stop();
     QLabel* gif = nullptr;
     QMovie* movie = nullptr;
     QPropertyAnimation* animation = nullptr;

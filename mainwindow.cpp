@@ -23,8 +23,15 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/res/icon.jpg"));
     setMouseTracking(true);   
     installEventFilter(this);
+    //绑定初始生命值
+    this->health = the_map->get_health();
+    health_remain = new QProgressBar(this);
+    health_remain->setRange(0, *health);
+    health_remain->setFormat("%v");
+    health_remain->move(0, 0);
+    health_remain->setValue(*health);
     //显示资源
-    display_source();
+    display_source_health();
     //添加一个敌人
     the_map->add_enemy(this, 1, Enemy::Daida);
 
@@ -108,13 +115,14 @@ void MainWindow::paintEvent(QPaintEvent*){
     QPainter painter(this);
     QPixmap pix;
     pix.load(":/res/menu.png");
-    painter.drawPixmap(0, 700, 1050, 100, pix);
+    painter.drawPixmap(0, 70*the_map->get_row(), 1050, 100, pix);
 }
 
-void MainWindow::display_source(){ //递归调用每0.2s刷新显示资源（感觉这样做不太好，如果有某种捆绑表示最好）
+void MainWindow::display_source_health(){ //递归调用每0.2s刷新显示资源（感觉这样做不太好，如果有某种捆绑表示最好）
     ui->source->setText(to_string(the_map->get_source()).c_str());
+    this->health_remain->setValue(*health);
     QTimer::singleShot(200, this, [=](){
-        display_source();
+        display_source_health();
     });
 }
 

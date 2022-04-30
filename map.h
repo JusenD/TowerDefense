@@ -15,6 +15,8 @@ struct amap{
     int original_source = 0;
     int source_speed = 0;
     int add_once = 0;
+    //地图初始生命值
+    int health = 0;
 //    int array[10][15] = {
 //        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 //        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -38,6 +40,9 @@ class Map
     void increase_source();
     int row = 0;
     int colomn = 0;
+    int health = 0;
+    void defeat();
+    bool have_not_defeat = true;
 public:
     static vector<amap> all;
     static void init();
@@ -47,6 +52,7 @@ public:
     QWidget* parent;
     vector<Single_Path>* path;
     vector<Enemy*> all_enemy;
+    vector<Defender*> all_defender;
     vector<Block*> all_block;
     void add_enemy(QWidget *parent, int which_path, int who, int step = 0);
     void add_defender(Block* where, Defender* single_defender);
@@ -54,6 +60,8 @@ public:
     //资源系统
     int get_source();
     void add_source(int num);
+    void decrease_health(int num);
+    int* get_health();
 };
 
 #endif // MAP_H

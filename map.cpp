@@ -6,12 +6,15 @@
 #include"enemy.h"
 #include<QTimer>
 #include<QTime>
+#include<QMessageBox>
 
 vector<amap> Map::all;
 void  Map::init(){            //所有地图初始化
     int row = 0, colomn = 0;
     //一张15x10地图
     amap first_map;
+    //初始生命值
+    first_map.health = 500;
     //设置初始资源和增长速度
     first_map.original_source = 600;
     first_map.source_speed = 6000;
@@ -86,6 +89,8 @@ void  Map::init(){            //所有地图初始化
     //一张10x10地图
     row = 10; colomn = 10;
     amap second_map;
+    //初始生命值
+    second_map.health = 300;
     //设置初始资源和增长速度
     second_map.original_source = 0;
     second_map.source_speed = 3000;
@@ -119,6 +124,7 @@ Map::Map(QWidget* parent, int num){
     this->row = all[num].row;
     this->array = all[num].array;
     this->path = &all[num].path;
+    this->health = all[num].health;
     //初始化背景中的地块按钮
     QPixmap pix;
     for(int i = 0; i < row; i++){
@@ -233,36 +239,41 @@ int Map::get_row(){return row;}
 
 //添加敌方单位
 void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
-    Enemy* a_enemy = nullptr;
-    switch (who) {
-    case Enemy::Daida:
-        a_enemy = new Daida(parent, which_path, this, step);
-        break;
-    case Enemy::Skeleton:
-        a_enemy = new Skeleton(parent, which_path, this, step);
-        break;
-    case Enemy::Bat:
-        a_enemy = new Bat(parent, which_path, this, step);
-        break;
-    case Enemy::BlackWitch:
-        a_enemy = new BlackWitch(parent, which_path, this, step);
+    if(have_not_defeat){
+        Enemy* a_enemy = nullptr;
+        switch (who) {
+        case Enemy::Daida:
+            a_enemy = new Daida(parent, which_path, this, step);
+            break;
+        case Enemy::Skeleton:
+            a_enemy = new Skeleton(parent, which_path, this, step);
+            break;
+        case Enemy::Bat:
+            a_enemy = new Bat(parent, which_path, this, step);
+            break;
+        case Enemy::BlackWitch:
+            a_enemy = new BlackWitch(parent, which_path, this, step);
+        }
+    //    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
+        if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
+            a_enemy->show();
+            a_enemy->start_move();
+            this->all_enemy.push_back(a_enemy);
+        }
+        else a_enemy->~Enemy();
     }
-//    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
-    if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
-        a_enemy->show();
-        a_enemy->start_move();
-        this->all_enemy.push_back(a_enemy);
-    }
-    else a_enemy->~Enemy();
 }
 
 //添加我方单位
 void Map::add_defender(Block *where, Defender *single_defender){
-    if(source >= single_defender->get_cost()){ 
-        if(where->all_defender.empty()) {
-            source-=single_defender->get_cost();
-            where->all_defender.push_back(single_defender);
-            single_defender->add(where);
+    if(have_not_defeat){
+        if(source >= single_defender->get_cost()){
+            if(where->all_defender.empty()) {
+                source-=single_defender->get_cost();
+                where->all_defender.push_back(single_defender);
+                single_defender->add(where);
+                all_defender.push_back(single_defender);
+            }
         }
     }
 }
@@ -270,8 +281,10 @@ void Map::add_defender(Block *where, Defender *single_defender){
 //资源随时间增加，使用递归调用
 void Map::increase_source(){
     QTimer::singleShot(ADD_TIME, [=](){
-        source += ADD_ONCE;
-        increase_source();
+        if(have_not_defeat){
+            source += ADD_ONCE;
+            increase_source();
+        }
     });
 }
 
@@ -282,3 +295,33 @@ int Map::get_source(){
 void Map::add_source(int num){
     source += num;
 }
+
+int* Map::get_health(){
+    return &health;
+}
+
+//减少生命值
+void Map::decrease_health(int num){
+    health -= num;
+    if(health <= 0) defeat();
+}
+
+void Map::defeat(){
+    have_not_defeat = false;
+    QMessageBox::information(parent, "info", "Defeat");
+    for(int i = 0; i < this->all_enemy.size();i++) all_enemy[i]->stop();
+    for(int j = 0; j < this->all_defender.size(); j++) all_defender[j]->stop();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

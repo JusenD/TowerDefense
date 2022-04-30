@@ -11,7 +11,7 @@ class Defender : public QWidget
     Q_OBJECT
 public:
     //枚举所有我方单位
-    enum Defenders{Boji, Witch, EvilWizard, Droid};
+    enum Defenders{Boji, Witch, EvilWizard, Droid, Soildier};
     explicit Defender(QWidget *parent = nullptr);
     virtual void add(Block* place);
     virtual int get_cost();
@@ -20,6 +20,7 @@ public:
     bool is_fighter();
     void remove_defender();
     void mouseReleaseEvent(QMouseEvent* event);
+    void stop();
 protected:
     int health = 0;
     int damage = 0;
@@ -27,6 +28,7 @@ protected:
     bool fighter = false;
     Block* place;
     QWidget* parent;
+    bool unfinished = true;
 signals:
 
 };
@@ -77,6 +79,19 @@ public:
     explicit Droid(QWidget *parent);
     int get_cost();
     void add(Block* place);
+    void attack();
+    void die();
+};
+
+class Soildier : public Defender{
+    QLabel *gif = nullptr;
+    QMovie* movie = nullptr;
+    QPropertyAnimation* animation1 = nullptr;
+    QPropertyAnimation* animation2 = nullptr;
+public:
+    explicit Soildier(QWidget *parent);
+    int get_cost();
+    void add(Block* place, int x_now, int y_now);
     void attack();
     void die();
 };

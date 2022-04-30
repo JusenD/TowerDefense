@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include"map.h"
 #include"selection.h"
+#include<QProgressBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,7 +18,7 @@ public:
     void paintEvent(QPaintEvent*);
     Map *the_map;
     ~MainWindow();
-    void display_source();
+    void display_source_health();
     void set_select(Defender* selected, QString coming, Selection* selec_selection);
 //    void mouseMoveEvent(QMouseEvent* ev);
     bool eventFilter(QObject* object, QEvent* event);
@@ -34,6 +35,8 @@ private:
     QLabel *spade = nullptr;
     bool remove_now = false;
     Ui::MainWindow *ui;
+    int* health;
+    QProgressBar* health_remain = nullptr;
 friend void Block::mouseReleaseEvent(QMouseEvent *ev);
 friend void Block::enterEvent(QEvent *event);
 };

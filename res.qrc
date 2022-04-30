@@ -79,5 +79,9 @@
         <file>res/BlackWitchCall.gif</file>
         <file>res/BlackWitchFly.gif</file>
         <file>res/BlackWitchDead.gif</file>
+        <file>res/SoildierAttack.gif</file>
+        <file>res/SoildierDead.gif</file>
+        <file>res/SoildierWait.gif</file>
+        <file>res/SoildierWalk.gif</file>
     </qresource>
 </RCC>
