@@ -32,7 +32,7 @@ void Defender::health_decrease(int n, int time){
 
 void Defender::die(){
     this->place->delete_defender(this);
-    this->~Defender();
+    this->deleteLater();
 }
 
 void Defender::stop(){
@@ -324,7 +324,7 @@ void Witch::die(){
         cut_off(range_circle, 250);
         bounce_out = false;
     }
-    this->~Witch();
+    this->deleteLater();
 }
 
 EvilWizard::EvilWizard(QWidget *parent)
@@ -415,7 +415,7 @@ void EvilWizard::die(){
     movie->start();
     this->place->delete_defender(this);
     cut_off(gif, 800);
-    this->~EvilWizard();
+    this->deleteLater();
 }
 
 Droid::Droid(QWidget *parent)
@@ -480,7 +480,7 @@ void Droid::die(){
     movie->start();
     this->place->delete_defender(this);
     cut_off(gif, 700);
-    this->~Droid();
+    this->deleteLater();
 }
 
 Soildier::Soildier(QWidget *parent)

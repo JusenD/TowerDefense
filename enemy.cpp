@@ -178,7 +178,7 @@ void Daida::die(){
             break;
         }
     }
-    this->~Daida();
+    this->deleteLater();
 }
 
 void Daida::paintEvent(QPaintEvent *){
@@ -335,7 +335,7 @@ void Skeleton::die(){
     gif->setMovie(movie);
     gif->show();
     cut_off(gif, 1400);
-    this->~Skeleton();
+    this->deleteLater();
 }
 
 
@@ -480,7 +480,7 @@ void Bat::die(){
     gif->setMovie(movie);
     gif->show();
     cut_off(gif, 1100);
-    this->~Bat();
+    this->deleteLater();
 }
 
 BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
@@ -606,7 +606,7 @@ void BlackWitch::die(){
     //设置逃离动画
     runaaaa(gif, 700);
     cut_off(gif, 2200);
-    this->~BlackWitch();
+    this->deleteLater();
 }
 
 void BlackWitch::stop_move(){
