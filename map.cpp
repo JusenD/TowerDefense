@@ -14,7 +14,7 @@ void  Map::init(){            //所有地图初始化
     //一张15x10地图
     amap first_map;
     //初始生命值
-    first_map.health = 500;
+    first_map.health = 5000;
     //设置初始资源和增长速度
     first_map.original_source = 1000;
     first_map.source_speed = 6000;
@@ -239,7 +239,7 @@ int Map::get_row(){return row;}
 
 //添加敌方单位
 void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
-    if(have_not_defeat){
+    if(have_not_defeat && (step < (*this->path)[which_path].way.size())){
         Enemy* a_enemy = nullptr;
         switch (who) {
         case Enemy::Daida:

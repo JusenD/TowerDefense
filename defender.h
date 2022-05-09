@@ -14,7 +14,7 @@ public:
     enum Defenders{Boji, Witch, EvilWizard, Droid, Soildier, King};
     explicit Defender(QWidget *parent = nullptr);
     virtual void add(Block* place);
-    virtual int get_cost();
+    int get_cost();
     void health_decrease(int n, int time);
     virtual void die();
     bool is_fighter();
@@ -37,7 +37,6 @@ class Boji : public Defender{
 public:
     explicit Boji(QWidget *parent);
     void paintEvent(QPaintEvent *);
-    int get_cost();
     void add(Block* place);
 //    void attack();
 //    void enterEvent(QEnterEvent *evnet);
@@ -54,7 +53,6 @@ class Witch : public Defender{
     int enemy_x = 0, enemy_y = 0;
 public:
     explicit Witch(QWidget *parent);
-    int get_cost();
     void add(Block* place);
     void attack();
     void die();
@@ -66,7 +64,6 @@ class EvilWizard : public Defender{
     QMovie* movie = nullptr;
 public:
     explicit EvilWizard(QWidget *parent);
-    int get_cost();
     void add(Block* place);
     void attack();
     void die();
@@ -77,7 +74,6 @@ class Droid : public Defender{
     QMovie* movie = nullptr;
 public:
     explicit Droid(QWidget *parent);
-    int get_cost();
     void add(Block* place);
     void attack();
     void die();
@@ -90,7 +86,6 @@ class Soildier : public Defender{
     QPropertyAnimation* animation2 = nullptr;
 public:
     explicit Soildier(QWidget *parent);
-    int get_cost();
     void add(Block* place, int x_now, int y_now);
     void attack();
     void die();
@@ -102,7 +97,6 @@ class King : public Defender{
     Block* target = nullptr;
 public:
     explicit King(QWidget *parent);
-    int get_cost();
     void add(Block* place);
     void attack();
     void die();

@@ -32,7 +32,7 @@ void Defender::health_decrease(int n, int time){
 
 void Defender::die(){
     this->place->delete_defender(this);
-    this->~Defender();
+    this->deleteLater();
 }
 
 void Defender::stop(){
@@ -62,10 +62,6 @@ Boji::Boji(QWidget *parent)
     this->cost = 100;
     this->fighter = true;
 //   this->move(place->x(), place->y());
-}
-
-int Boji::get_cost(){
-    return this->cost;
 }
 
 void Boji::paintEvent(QPaintEvent *){
@@ -150,12 +146,11 @@ Witch::Witch(QWidget *parent)
     this->range = 300;
     this->fighter = false;
 //   this->move(place->x(), place->y());
-
+    //初始化animation
+    animation1 = new QPropertyAnimation(range_circle);
+    animation2 = new QPropertyAnimation(range_circle);
 }
 
-int Witch::get_cost(){
-    return this->cost;
-}
 
 void Witch::add(Block* place){
     this->place = place;
@@ -263,8 +258,8 @@ bool Witch::eventFilter(QObject *obj, QEvent *event){
                 range_circle->setScaledContents(true);
                 range_circle->setPixmap(pix);
                 range_circle->setAttribute(Qt::WA_TransparentForMouseEvents);
-                animation1 = new QPropertyAnimation(range_circle);
-                animation2 = new QPropertyAnimation(range_circle);
+                animation1->stop();
+                animation2->stop();
                 /* 设置动画持续时长 */
                 animation1->setDuration(200);
                 /* 设置动画目标 */
@@ -324,7 +319,7 @@ void Witch::die(){
         cut_off(range_circle, 250);
         bounce_out = false;
     }
-    this->~Witch();
+    this->deleteLater();
 }
 
 EvilWizard::EvilWizard(QWidget *parent)
@@ -349,10 +344,6 @@ EvilWizard::EvilWizard(QWidget *parent)
     gif->hide();
 
 //   this->move(place->x(), place->y());
-}
-
-int EvilWizard::get_cost(){
-    return this->cost;
 }
 
 void EvilWizard::add(Block* place){
@@ -415,7 +406,7 @@ void EvilWizard::die(){
     movie->start();
     this->place->delete_defender(this);
     cut_off(gif, 800);
-    this->~EvilWizard();
+    this->deleteLater();
 }
 
 Droid::Droid(QWidget *parent)
@@ -431,9 +422,6 @@ Droid::Droid(QWidget *parent)
 //   this->move(place->x(), place->y());
 }
 
-int Droid::get_cost(){
-    return this->cost;
-}
 
 void Droid::add(Block* place){
     this->place = place;
@@ -480,7 +468,7 @@ void Droid::die(){
     movie->start();
     this->place->delete_defender(this);
     cut_off(gif, 700);
-    this->~Droid();
+    this->deleteLater();
 }
 
 Soildier::Soildier(QWidget *parent)
@@ -494,9 +482,6 @@ Soildier::Soildier(QWidget *parent)
     this->fighter = true;
 }
 
-int Soildier::get_cost(){
-    return this->cost;
-}
 
 void Soildier::add(Block* place, int x_now, int y_now){
     this->place = place;
@@ -586,10 +571,6 @@ King::King(QWidget *parent)
     this->cost = 800;
     this->fighter = true;
 //   this->move(place->x(), place->y());
-}
-
-int King::get_cost(){
-    return this->cost;
 }
 
 void King::add(Block* place){

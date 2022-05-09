@@ -91,13 +91,17 @@ void Daida::move_once(){
     //游戏结束所有操作中断
     if(unfinished){
         step++;
-        if(step == this_path->way.size()){
+        if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
             end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            animation->stop();
+            animation1->stop();
+            animation2->stop();
+            animation3->stop();
             if(!block_now->empty()){
                 //设置时间间隔
                 animation->setDuration(1300);
@@ -178,7 +182,7 @@ void Daida::die(){
             break;
         }
     }
-    this->~Daida();
+    this->deleteLater();
 }
 
 void Daida::paintEvent(QPaintEvent *){
@@ -209,6 +213,9 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    //初始化animation
+    animation = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
 }
 
 void Skeleton::start_move(){
@@ -255,15 +262,15 @@ void Skeleton::move_once(){//3s完成线性的行走
         movie->start();
         gif->show();
         step++;
-        if(step == this_path->way.size()){
+        if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
             end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
-            animation = new QPropertyAnimation(this, "geometry");
-            animation2 = new QPropertyAnimation(gif, "geometry");
+            animation->stop();
+            animation2->stop();
             //设置起始位置
             animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
             animation2->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
@@ -335,7 +342,7 @@ void Skeleton::die(){
     gif->setMovie(movie);
     gif->show();
     cut_off(gif, 1400);
-    this->~Skeleton();
+    this->deleteLater();
 }
 
 
@@ -359,6 +366,9 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    //初始化animation
+    animation = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
 }
 
 void Bat::start_move(){
@@ -403,15 +413,15 @@ void Bat::move_once(){//3s完成线性的行走
         movie->start();
         gif->show();
         step++;
-        if(step == this_path->way.size()){
+        if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
             end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
-            animation = new QPropertyAnimation(this, "geometry");
-            animation2 = new QPropertyAnimation(gif, "geometry");
+            animation->stop();
+            animation2->stop();
             //设置起始位置
             animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
             animation2->setStartValue(QRect(x_now, y_now, gif->width(), gif->height()));
@@ -480,7 +490,7 @@ void Bat::die(){
     gif->setMovie(movie);
     gif->show();
     cut_off(gif, 1100);
-    this->~Bat();
+    this->deleteLater();
 }
 
 BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
@@ -503,6 +513,9 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    //初始化anmiation
+    animation = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
 }
 
 void BlackWitch::start_move(){
@@ -522,15 +535,15 @@ void BlackWitch::move_once(){
         movie->start();
         gif->show();
         step++;
-        if(step == this_path->way.size()){
+        if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
             end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
-            animation = new QPropertyAnimation(this, "geometry");
-            animation2 = new QPropertyAnimation(gif, "geometry");
+            animation->stop();
+            animation2->stop();
             //设置起始位置
             animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
             animation2->setStartValue(QRect(x_now, y_now, gif->width(), gif->height()));
@@ -606,7 +619,7 @@ void BlackWitch::die(){
     //设置逃离动画
     runaaaa(gif, 700);
     cut_off(gif, 2200);
-    this->~BlackWitch();
+    this->deleteLater();
 }
 
 void BlackWitch::stop_move(){
