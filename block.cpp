@@ -64,6 +64,10 @@ void Block::add_defender(Defender* single_defender){
     }
 }
 
+void Block::push_a_defender(Defender* single_defender){
+    this->all_defender.push_back(single_defender);
+}
+
 void Block::delete_defender(Defender* defender){
     std::vector<Defender*>::iterator itor;
     for (itor = all_defender.begin(); itor != all_defender.end(); itor++)

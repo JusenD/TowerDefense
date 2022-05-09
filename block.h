@@ -14,6 +14,7 @@ public:
     friend Map;
     explicit Block(QWidget *parent, int x, int y);
     void add_defender(Defender* single_defender);
+    void push_a_defender(Defender* single_defender);
     std::vector<Defender*>* defender_in();
     QLabel *coming_picture;
     bool empty();

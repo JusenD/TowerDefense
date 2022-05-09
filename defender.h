@@ -11,7 +11,7 @@ class Defender : public QWidget
     Q_OBJECT
 public:
     //枚举所有我方单位
-    enum Defenders{Boji, Witch, EvilWizard, Droid, Soildier};
+    enum Defenders{Boji, Witch, EvilWizard, Droid, Soildier, King};
     explicit Defender(QWidget *parent = nullptr);
     virtual void add(Block* place);
     virtual int get_cost();
@@ -94,6 +94,19 @@ public:
     void add(Block* place, int x_now, int y_now);
     void attack();
     void die();
+};
+
+class King : public Defender{
+    QLabel *gif = nullptr;
+    QMovie* movie = nullptr;
+    Block* target = nullptr;
+public:
+    explicit King(QWidget *parent);
+    int get_cost();
+    void add(Block* place);
+    void attack();
+    void die();
+    void setTarget(Block* target);
 };
 
 #endif // DEFENDER_H

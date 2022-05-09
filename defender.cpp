@@ -502,10 +502,10 @@ void Soildier::add(Block* place, int x_now, int y_now){
     this->place = place;
     //装载走路动画
     gif = new QLabel(parent);
-    gif->setFixedSize(100, 70);
+    gif->setFixedSize(120, 84);
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->setScaledContents(true);
-    gif->move(x_now, y_now);
+    gif->move(x_now, y_now - 20);
     movie = new QMovie(":/res/SoildierWalk.gif");
     gif->setMovie(movie);
     movie->start();
@@ -513,43 +513,146 @@ void Soildier::add(Block* place, int x_now, int y_now){
     //设置移动动画
     animation1 = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
-    animation1->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
-    animation2->setStartValue(QRect(place->x(), place->y(), 100, 70));
-    animation1->setDuration(1000);
-    animation2->setDuration(1000);
+    animation1->setStartValue(QRect(x_now, y_now - 20, this->width(), this->height()));
+    animation2->setEndValue(QRect(place->x(), place->y() - 20, 100, 70));
+    animation1->setDuration(2000);
+    animation2->setDuration(2000);
     animation1->start();
     animation2->start();
 //    this->move(place->x(), place->y());
     this->show();
-    QTimer::singleShot(1100, this, [=](){
+    QTimer::singleShot(2100, this, [=](){
+        //显示等待动画
+        movie = new QMovie(":/res/SoildierWait.gif");
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
         this->attack();
     });
 }
 
 void Soildier::attack(){
     if(unfinished){
-        //显示等待动画
-        movie = new QMovie(":/res/SoildierWait.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
         vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
-            bool whether = false;
-            //只能攻击一个
-            for(int i = 0; i < all_enemy->size(); i++){
-                if((*all_enemy)[i]->block_now == this->place){
-                    if((*all_enemy)[i]->is_ground()){
+        bool whether = false;
+        //只能攻击一个
+        for(int i = 0; i < all_enemy->size(); i++){
+            if((*all_enemy)[i]->block_now == this->place){
+                if((*all_enemy)[i]->is_ground()){
+                    QTimer::singleShot(2500, this, [=](){
                         (*all_enemy)[i]->health_decrease(damage, 260);
-                        whether = true;
-                        break;
-                    }
+                    });
+                    whether = true;
+                    break;
                 }
             }
+        }
+        if(whether){
+            movie = new QMovie(":/res/SoildierAttack.gif");
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            QTimer::singleShot(3000, this, [=](){
+                //显示等待动画
+                movie = new QMovie(":/res/SoildierWait.gif");
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+            });
+        }
+        QTimer::singleShot(5000, this, [=](){
+            attack();
+        });
     }
 }
 
 void Soildier::die(){
+    QMovie* movie = new QMovie(":/res/SoildierDead.gif");
+    gif->setMovie(movie);
+    movie->start();
+    this->place->delete_defender(this);
+    cut_off(gif, 3700);
+    this->deleteLater();
+}
 
+King::King(QWidget *parent)
+    : Defender{parent}
+{
+//    this->place = place;
+    this->parent = parent;
+    this->resize(70, 70);
+    this->health = 400;
+    this->damage = 0;
+    this->cost = 800;
+    this->fighter = true;
+//   this->move(place->x(), place->y());
+}
+
+int King::get_cost(){
+    return this->cost;
+}
+
+void King::add(Block* place){
+    this->place = place;
+    //设置自身位置(已经被添加到了所在Block的all_defender里
+    this->move(place->x(), place->y());
+//    qDebug()<<place->x()<<place->y();
+    this->show();
+    //显示等待动画gif
+    gif = new QLabel(parent);
+    gif->setFixedSize(100, 80);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->move(place->x()-15, place->y()-10);
+    QMovie* movie = new QMovie(":/res/KingWait.gif");
+    gif->setMovie(movie);
+    movie->start();
+    gif->show();
+    this->attack();
+}
+
+void King::setTarget(Block* target){
+    this->target = target;
+}
+
+void King::attack(){
+    if(unfinished){
+        if(target && target->empty()){
+        //执行召唤动画
+        QMovie* movie = new QMovie(":/res/KingCall.gif");
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
+        QTimer::singleShot(2500, this, [=](){
+            //召唤皇家卫兵
+            if(target->empty()){
+                class::Soildier* a_soildier = new class::Soildier(parent);
+                target->push_a_defender(a_soildier);
+                a_soildier->move(target->x(), target->y());
+                a_soildier->add(target, this->x(), this->y());
+                ((MainWindow*)parent)->the_map->all_defender.push_back(a_soildier);
+            }
+        });
+        QTimer::singleShot(3000, this, [=](){
+            QMovie* movie = new QMovie(":/res/KingWait.gif");
+            gif->setMovie(movie);
+            movie->start();
+        });
+        }
+        //递归调用
+        QTimer::singleShot(15000, this, [=](){
+            attack();
+        });
+    }
+}
+
+void King::die(){
+    QMovie* movie = new QMovie(":/res/KingDeath.gif");
+    gif->setMovie(movie);
+    movie->start();
+    this->place->delete_defender(this);
+    cut_off(gif, 2500);
+    this->deleteLater();
 }
 
 

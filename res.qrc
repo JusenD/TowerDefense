@@ -83,5 +83,8 @@
         <file>res/SoildierDead.gif</file>
         <file>res/SoildierWait.gif</file>
         <file>res/SoildierWalk.gif</file>
+        <file>res/KingCall.gif</file>
+        <file>res/KingDeath.gif</file>
+        <file>res/KingWait.gif</file>
     </qresource>
 </RCC>

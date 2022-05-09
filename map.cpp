@@ -16,7 +16,7 @@ void  Map::init(){            //所有地图初始化
     //初始生命值
     first_map.health = 500;
     //设置初始资源和增长速度
-    first_map.original_source = 600;
+    first_map.original_source = 1000;
     first_map.source_speed = 6000;
     first_map.add_once = 50;
     row = 10; colomn = 15;
