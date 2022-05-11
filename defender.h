@@ -18,6 +18,8 @@ public:
     void health_decrease(int n, int time);
     virtual void die();
     bool is_fighter();
+    bool is_tower();
+    bool is_king();
     void remove_defender();
     void mouseReleaseEvent(QMouseEvent* event);
     void stop();
@@ -26,6 +28,8 @@ protected:
     int damage = 0;
     int cost = 0;
     bool fighter = false;
+    bool tower = false;
+    bool king = false;
     Block* place;
     QWidget* parent;
     bool unfinished = true;

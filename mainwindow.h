@@ -28,6 +28,9 @@ public:
     void set_spade(QLabel* spade);
     void change_remove(bool whether);
     bool can_remove();
+    void enter_call_state(int row, int colomn);
+    void cancel_call_state();
+    bool is_calling();
 private:
     Defender* selected = nullptr;
     QString coming = "";
@@ -37,6 +40,9 @@ private:
     Ui::MainWindow *ui;
     int* health;
     QProgressBar* health_remain = nullptr;
+    bool calling = false;
+    int call_row = 0;
+    int call_colomn = 0;
 friend void Block::mouseReleaseEvent(QMouseEvent *ev);
 friend void Block::enterEvent(QEvent *event);
 };

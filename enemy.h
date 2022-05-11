@@ -34,7 +34,8 @@ public:
     int get_x();
     int get_y();
     void end();
-
+    void delete_enemy();
+    static bool all_enemy_access;
 protected:
     //设置生命值
     int health = 0;

@@ -43,6 +43,14 @@ bool Defender::is_fighter(){
     return fighter;
 }
 
+bool Defender::is_tower(){
+    return tower;
+}
+
+bool Defender::is_king(){
+    return king;
+}
+
 void Defender::mouseReleaseEvent(QMouseEvent *event){
     if(((MainWindow*)parent)->can_remove()){
         ((MainWindow*)parent)->change_remove(false);
@@ -198,6 +206,7 @@ void Witch::attack(){
         int target = 0;
         //范围判定,只能攻击一个
         for(int i = 0; i < all_enemy->size(); i++){
+            if(!(*all_enemy)[i]) continue;
             int distance = ((*all_enemy)[i]->x() - this->place->x())*((*all_enemy)[i]->x() - this->place->x())
                     + ((*all_enemy)[i]->y() - this->place->y())*((*all_enemy)[i]->y() - this->place->y());
             if(distance <= range*range){
@@ -365,6 +374,7 @@ void EvilWizard::attack(){
         //范围判定 可以攻击前方两格内的所有敌人
         int range = 105;
         for(int i = 0; i < all_enemy->size(); i++){
+            if(!(*all_enemy)[i]) continue;
             int distance = (*all_enemy)[i]->block_now->x() - this->place->x();
             if(distance>0 && distance <= range && (*all_enemy)[i]->block_now->y() - this->place->y() < 20
                     && (*all_enemy)[i]->block_now->y() - this->place->y() > -20){
@@ -374,8 +384,9 @@ void EvilWizard::attack(){
         }
         //范围伤害
         for(int i = 0; i < all_enemy->size(); i++){
+            if(!(*all_enemy)[i]) continue;
             if((*all_enemy)[i]->block_now == this->place){
-                (*all_enemy)[i]->health_decrease(damage, 500);
+                (*all_enemy)[i]->health_decrease(damage, 300);
                 whether = true;
             }
         }
@@ -476,8 +487,8 @@ Soildier::Soildier(QWidget *parent)
 {
     this->parent = parent;
     this->resize(70, 70);
-    this->health = 150;
-    this->damage = 10;
+    this->health = 300;
+    this->damage = 30;
     this->cost = 0;
     this->fighter = true;
 }
@@ -518,15 +529,14 @@ void Soildier::add(Block* place, int x_now, int y_now){
 
 void Soildier::attack(){
     if(unfinished){
-        vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
         bool whether = false;
         //只能攻击一个
-        for(int i = 0; i < all_enemy->size(); i++){
-            if((*all_enemy)[i]->block_now == this->place){
-                if((*all_enemy)[i]->is_ground()){
-                    QTimer::singleShot(2500, this, [=](){
-                        (*all_enemy)[i]->health_decrease(damage, 260);
-                    });
+        for(int i = 0; i < (&((MainWindow*)(this->parent))->the_map->all_enemy)->size(); i++){
+            if((*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]&&(*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->block_now == this->place){
+                if((*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]&&(*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->is_ground()){
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 900);
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 1500);
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 2800);
                     whether = true;
                     break;
                 }
@@ -545,7 +555,7 @@ void Soildier::attack(){
                 gif->show();
             });
         }
-        QTimer::singleShot(5000, this, [=](){
+        QTimer::singleShot(6000, this, [=](){
             attack();
         });
     }
@@ -569,7 +579,8 @@ King::King(QWidget *parent)
     this->health = 400;
     this->damage = 0;
     this->cost = 800;
-    this->fighter = true;
+    this->fighter = false;
+    this->king = true;
 //   this->move(place->x(), place->y());
 }
 
@@ -589,11 +600,11 @@ void King::add(Block* place){
     gif->setMovie(movie);
     movie->start();
     gif->show();
-    this->attack();
 }
 
 void King::setTarget(Block* target){
     this->target = target;
+    this->attack();
 }
 
 void King::attack(){

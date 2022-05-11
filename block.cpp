@@ -6,7 +6,7 @@
 #include<QMouseEvent>
 #include<QDebug>
 
-Block::Block(QWidget *parent, int x, int y)
+Block::Block(QWidget *parent, int colomn_now, int row_now)
     : QWidget{parent}
 {
     this->parent = parent;
@@ -17,16 +17,36 @@ Block::Block(QWidget *parent, int x, int y)
     coming_picture->raise();
     coming_picture->setScaledContents(true);
     coming_picture->setFixedSize(70, 100);
-    coming_picture->move(x, y - 30);
+    coming_picture->move(colomn_now*70, row_now*70 - 30);
+    the_map = ((MainWindow*)parent)->the_map;
+
+    this->row_now = row_now;
+    this->colomn_now = colomn_now;
 }
 
 void Block::mouseReleaseEvent(QMouseEvent *ev){
     //添加选中的我方单位
     qDebug()<<"鼠标释放了！";
-    if(((MainWindow*)parent)->selected != nullptr){
+    //将悬停图片清除
+    coming_picture->clear();
+    //选择国王召唤位置状态
+    if(((MainWindow*)parent)->calling){
+        int r = ((MainWindow*)parent)->call_row, c = ((MainWindow*)parent)->call_colomn;
+        //判断九宫格
+        if(abs(r - this->row_now) <= 1 && abs(c - this->colomn_now) <= 1 && !(r == this->row_now && c== this->colomn_now)){
+            ((King*)((MainWindow*)parent)->selected)->setTarget(this);
+            ((MainWindow*)parent)->cancel_call_state();
+        }
+    }
+    else if(((MainWindow*)parent)->selected != nullptr){
         add_defender(((MainWindow*)parent)->selected);
-        ((MainWindow*)parent)->selected = nullptr;
-        ((MainWindow*)parent)->coming = "";
+        if(((MainWindow*)parent)->selected->is_king()){
+            ((MainWindow*)parent)->enter_call_state(this->row_now, this->colomn_now);
+        }
+        else{
+            ((MainWindow*)parent)->selected = nullptr;
+            ((MainWindow*)parent)->coming = "";
+        }
     }
     if(((MainWindow*)parent)->select_selection) emit ((MainWindow*)parent)->select_selection->mouseReleaseEvent(ev);
 }
@@ -34,7 +54,17 @@ void Block::mouseReleaseEvent(QMouseEvent *ev){
 //绘制即将选中的悬停效果
 void Block::enterEvent(QEvent *event){
  //   qDebug()<<"鼠标进入了！";
-    if(((MainWindow*)parent)->coming != ""){
+    if(((MainWindow*)parent)->calling){
+        int r = ((MainWindow*)parent)->call_row, c = ((MainWindow*)parent)->call_colomn;
+        //判断九宫格
+        if(abs(r - this->row_now) <= 1 && abs(c - this->colomn_now) <= 1 && !(r == this->row_now && c== this->colomn_now)){
+            QPixmap pix;
+            pix.load(((MainWindow*)parent)->coming);
+            coming_picture->setPixmap(pix);
+            coming_picture->show();
+        }
+    }
+    else if(((MainWindow*)parent)->coming != ""){
         if((type == "Road" && ((MainWindow*)parent)->selected->is_fighter())
                 ||(type == "Grass" && !((MainWindow*)parent)->selected->is_fighter())){
             //设置图案
@@ -88,25 +118,25 @@ bool Block::is_grass(){return grass;}
 
 void Block::not_grass(){grass = false;}
 
-Grass::Grass(QWidget* parent, int x, int y)
-    : Block{parent, x, y}
+Grass::Grass(QWidget* parent, int colomn_now, int row_now)
+    : Block{parent, colomn_now, row_now}
 {
     grass = true;
     this->parent = parent;
     this->type = "Grass";
     //移动到该方位
-    this->move(x, y);
+    this->move(colomn_now*70, row_now*70);
 }
 
-Road::Road(QWidget* parent, int x, int y, int choice)
-    : Block{parent, x, y}
+Road::Road(QWidget* parent, int colomn_now, int row_now, int choice)
+    : Block{parent, colomn_now, row_now}
 {
     grass = false;
     this->parent = parent;
     this->choice = choice;
     this->type = "Road";
     //移动到该方位
-    this->move(x, y);
+    this->move(colomn_now*70, row_now*70);
 }
 
 void Block::paintEvent(QPaintEvent *){

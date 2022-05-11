@@ -8,7 +8,7 @@
 
 using namespace std;
 struct amap{
-    int row = 0;
+    int row = 0;        //尺寸最小2x2!!
     int colomn = 0;
     int* array = nullptr;
     //地图初始资源和增长速度

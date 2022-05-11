@@ -71,6 +71,19 @@ Selection::Selection(MainWindow *parent, int who)
         unsufficient(100);
         break;
     }
+    case Defender::King:{
+        name = "King";
+        QPixmap pix;
+        pix.load(":/res/King.png");
+        //设置不规则图片样式
+        this->setStyleSheet("QPushButton{border:0px;}");
+        setIcon(pix);
+        setIconSize(QSize(90, 90));
+        //设置说明文字
+        this->setText("国王\n消耗：\n800");
+        unsufficient(800);
+        break;
+    }
     }
 }
 
@@ -87,67 +100,75 @@ void Selection::cancel(){
 }
 
 void Selection::mouseReleaseEvent(QMouseEvent *ev){
-    if(can_select){
-        if(!has_selected) {
-            has_selected = true;
-            QString buffer = ":/res/";
-            buffer.append(name).append("_selected.png");
-            QPixmap pix;
-            pix.load(buffer);
-            //设置不规则图片样式
-            this->setStyleSheet("QPushButton{border:0px;}");
-            setIcon(pix);
-            setIconSize(QSize(90, 90));
-            Defender* defender = nullptr;
-            switch(who){
-            case Defender::Boji:
-                defender = new Boji(parent);
-                parent->set_select(defender, ":/res/boji_coming.png", this);
-                break;
-            case Defender::Witch:
-                defender = new Witch(parent);
-                parent->set_select(defender, ":/res/witch_coming.png", this);
-                break;
-            case Defender::EvilWizard:
-                defender = new EvilWizard(parent);
-                parent->set_select(defender, ":/res/EvilWizard_coming.png", this);
-                break;
-            case Defender::Droid:
-                defender = new Droid(parent);
-                parent->set_select(defender, ":/res/Droid_coming.png", this);
-                break;
+    if(!parent->is_calling()){
+        if(can_select){
+            if(!has_selected) {
+                has_selected = true;
+                QString buffer = ":/res/";
+                buffer.append(name).append("_selected.png");
+                QPixmap pix;
+                pix.load(buffer);
+                //设置不规则图片样式
+                this->setStyleSheet("QPushButton{border:0px;}");
+                setIcon(pix);
+                setIconSize(QSize(90, 90));
+                Defender* defender = nullptr;
+                switch(who){
+                case Defender::Boji:
+                    defender = new Boji(parent);
+                    parent->set_select(defender, ":/res/boji_coming.png", this);
+                    break;
+                case Defender::Witch:
+                    defender = new Witch(parent);
+                    parent->set_select(defender, ":/res/witch_coming.png", this);
+                    break;
+                case Defender::EvilWizard:
+                    defender = new EvilWizard(parent);
+                    parent->set_select(defender, ":/res/EvilWizard_coming.png", this);
+                    break;
+                case Defender::Droid:
+                    defender = new Droid(parent);
+                    parent->set_select(defender, ":/res/Droid_coming.png", this);
+                    break;
+                case Defender::King:
+                    defender = new King(parent);
+                    parent->set_select(defender, ":/res/King_coming.png", this);
+                }
             }
-        }
-        else  {
-            cancel();
-            //取消选择
-            parent->set_select(nullptr, "", nullptr);
+            else  {
+                cancel();
+                //取消选择
+                if(!parent->is_calling())
+                parent->set_select(nullptr, "", nullptr);
+            }
         }
     }
 }
 //设置资源不足时，会用黑色icon，并屏蔽按钮
 void Selection::unsufficient(int num){
     QTimer::singleShot(200, this, [=](){
-        if(((MainWindow*)this->parent)->the_map->get_source() < num){
-            can_select = false;
-            QString buffer = ":/res/";
-            buffer.append(name).append("_no.png");
-            QPixmap pix;
-            pix.load(buffer);
-            //设置不规则图片样式
-            this->setStyleSheet("QPushButton{border:0px;}");
-            setIcon(pix);
-            setIconSize(QSize(90, 90));
-        }else if(!has_selected){
-            QString buffer = ":/res/";
-            buffer.append(name).append(".png");
-            QPixmap pix;
-            pix.load(buffer);
-            //设置不规则图片样式
-            this->setStyleSheet("QPushButton{border:0px;}");
-            setIcon(pix);
-            setIconSize(QSize(90, 90));
-            can_select = true;
+        if(!(MainWindow*)this->parent->is_calling()){
+            if(((MainWindow*)this->parent)->the_map->get_source() < num){
+                can_select = false;
+                QString buffer = ":/res/";
+                buffer.append(name).append("_no.png");
+                QPixmap pix;
+                pix.load(buffer);
+                //设置不规则图片样式
+                this->setStyleSheet("QPushButton{border:0px;}");
+                setIcon(pix);
+                setIconSize(QSize(90, 90));
+            }else if(!has_selected){
+                QString buffer = ":/res/";
+                buffer.append(name).append(".png");
+                QPixmap pix;
+                pix.load(buffer);
+                //设置不规则图片样式
+                this->setStyleSheet("QPushButton{border:0px;}");
+                setIcon(pix);
+                setIconSize(QSize(90, 90));
+                can_select = true;
+            }
         }
         unsufficient(num);
     });

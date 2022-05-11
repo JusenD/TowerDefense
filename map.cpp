@@ -16,7 +16,7 @@ void  Map::init(){            //所有地图初始化
     //初始生命值
     first_map.health = 5000;
     //设置初始资源和增长速度
-    first_map.original_source = 1000;
+    first_map.original_source = 10000;
     first_map.source_speed = 6000;
     first_map.add_once = 50;
     row = 10; colomn = 15;
@@ -130,29 +130,29 @@ Map::Map(QWidget* parent, int num){
     for(int i = 0; i < row; i++){
         for(int j = 0; j < colomn; j++){
             if(array[i*colomn + j] == 0 || array[i*colomn + j] == 2){         //画草地
-                Grass* a_grass = new Grass(parent, j*70, i*70);
+                Grass* a_grass = new Grass(parent, j, i);
                 a_grass->show();
                 all_block.push_back(a_grass);
                 continue;
             }
-            //将路径图编码，对不同情况画不同图片
-            int x = 0;
-            //处理路径四个角
-            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j>1&&array[i*colomn + j - 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j-1] == 1)){
-                x+=1000;
-            }
-            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j+1] == 1)){
-                x+=100;
-            }
-            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i<row-1&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j>1&&array[i*colomn + j - 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j-1] == 1)){
-                x+=10;
-            }
-            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i<row&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j+1] == 1)){
-                x+=1;
-            }
+//            //将路径图编码，对不同情况画不同图片
+//            int x = 0;
+//            //处理路径四个角
+//            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j>1&&array[i*colomn + j - 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j-1] == 1)){
+//                x+=1000;
+//            }
+//            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j+1] == 1)){
+//                x+=100;
+//            }
+//            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i<row-1&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j>1&&array[i*colomn + j - 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j-1] == 1)){
+//                x+=10;
+//            }
+//            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i<row&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j+1] == 1)){
+//                x+=1;
+//            }
                                     //画路径
  //           Road* a_road = new Road(parent, j*70, i*70, x);
-            Road* a_road = new Road(parent, j*70, i*70, 0);
+            Road* a_road = new Road(parent, j, i, 0);
             a_road->show();
             all_block.push_back(a_road);
 

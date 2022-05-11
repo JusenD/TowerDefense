@@ -6,6 +6,27 @@
 #include<QMovie>
 #include<mainwindow.h>
 
+bool Enemy::all_enemy_access = true;
+//单独的删去敌人函数，避免同时删除bug
+void Enemy::delete_enemy(){
+    if(all_enemy_access){
+        all_enemy_access = false;
+        vector<Enemy*>::iterator itor = map->all_enemy.begin();
+        for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
+            if(*itor == this){
+                itor = map->all_enemy.erase(itor);
+                break;
+            }
+        }
+        all_enemy_access = true;
+    }
+    else{
+        QTimer::singleShot(3, this, [=](){
+            delete_enemy();
+        });
+    }
+}
+
 //所有敌人共用减少生命值函数
 void Enemy::health_decrease(int n, int time){
     QTimer::singleShot(time, this, [=](){
@@ -175,13 +196,7 @@ void Daida::attack(){       //一次攻击，攻击频率为 hz
 void Daida::die(){
     can_move = false;
     //在所有敌人中删除该敌人
-    vector<Enemy*>::iterator itor = map->all_enemy.begin();
-    for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
-        if(*itor == this){
-            itor = map->all_enemy.erase(itor);
-            break;
-        }
-    }
+    delete_enemy();
     this->deleteLater();
 }
 
@@ -329,13 +344,7 @@ void Skeleton::die(){
 //    gif->resize(60, 90);
     animation->stop();
     animation2->stop();
-    vector<Enemy*>::iterator itor = map->all_enemy.begin();
-    for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
-        if(*itor == this){
-            itor = map->all_enemy.erase(itor);
-            break;
-        }
-    }
+    delete_enemy();
 //    gif->resize(60, 90);
     movie = new QMovie(":/res/SkeletonDead.gif");
     movie->start();
@@ -478,13 +487,7 @@ void Bat::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
-    vector<Enemy*>::iterator itor = map->all_enemy.begin();
-    for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
-        if(*itor == this){
-            itor = map->all_enemy.erase(itor);
-            break;
-        }
-    }
+    delete_enemy();
     movie = new QMovie(":/res/BatDeath.gif");
     movie->start();
     gif->setMovie(movie);
@@ -569,21 +572,24 @@ void BlackWitch::start_call(){
     if(unfinished){
         started = true;
         QTimer::singleShot(7000, this, [=](){
-            movie = new QMovie(":/res/BlackWitchCall.gif");
-            gif->setMovie(movie);
-            movie->start();
-            gif->show();
-            //0.3s后召唤蝙蝠
-            QTimer::singleShot(300, this, [=](){
-                this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
-            });
-            QTimer::singleShot(500, this, [=](){
-                movie = new QMovie(":/res/BlackWitchFly.gif");
+            //快到终点时不再召唤，不然会有未知bug
+            if(step + 1 < this_path->way.size()){
+                movie = new QMovie(":/res/BlackWitchCall.gif");
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
-            });
-            start_call();
+                //0.3s后召唤蝙蝠
+                QTimer::singleShot(300, this, [=](){
+                    this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
+                });
+                QTimer::singleShot(500, this, [=](){
+                    movie = new QMovie(":/res/BlackWitchFly.gif");
+                    gif->setMovie(movie);
+                    movie->start();
+                    gif->show();
+                });
+                start_call();
+            }
         });
     }
 }
@@ -603,13 +609,7 @@ void BlackWitch::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
-    vector<Enemy*>::iterator itor = map->all_enemy.begin();
-    for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
-        if(*itor == this){
-            itor = map->all_enemy.erase(itor);
-            break;
-        }
-    }
+    delete_enemy();
     movie = new QMovie(":/res/BlackWitchDead.gif");
     movie->start();
     gif->resize(178, 252);
@@ -629,6 +629,7 @@ void BlackWitch::stop_move(){
 void BlackWitch::attack(){
 
 }
+
 
 
 

@@ -92,11 +92,16 @@ MainWindow::MainWindow(QWidget *parent)
     droid->move(460, 705);
     droid->show();
 
+    //添加国王 selection
+    Selection *king = new Selection(this, Defender::King);
+    king->move(590, 705);
+    king->show();
+
     //尝试添加King
-    King* a_soildier = new King(this);
-    a_soildier->move(the_map->all_block[10]->x(), the_map->all_block[10]->y());
-    a_soildier->setTarget(the_map->all_block[25]);
-    the_map->add_defender(the_map->all_block[40], a_soildier);
+//    King* a_soildier = new King(this);
+//    a_soildier->move(the_map->all_block[10]->x(), the_map->all_block[10]->y());
+//    a_soildier->setTarget(the_map->all_block[25]);
+//    the_map->add_defender(the_map->all_block[40], a_soildier);
 
 //    QPixmap pix;
 //    pix.load(":/res/spade_selection.png");
@@ -185,6 +190,26 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event){
         }
       }
       return QMainWindow::eventFilter(object, event);
+}
+
+//国王的设置召唤位置状态
+void MainWindow::enter_call_state(int row, int colomn){
+    call_colomn = colomn;
+    call_row = row;
+    calling = true;
+    coming =  ":/res/Soildier_coming.png";
+}
+
+bool MainWindow::is_calling(){
+    return calling;
+}
+
+void MainWindow::cancel_call_state(){
+    call_colomn = 0;
+    call_row = 0;
+    calling = false;
+    coming = "";
+    selected = nullptr;
 }
 
 MainWindow::~MainWindow()

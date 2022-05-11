@@ -86,5 +86,10 @@
         <file>res/KingCall.gif</file>
         <file>res/KingDeath.gif</file>
         <file>res/KingWait.gif</file>
+        <file>res/King.png</file>
+        <file>res/King_coming.png</file>
+        <file>res/King_no.png</file>
+        <file>res/King_selected.png</file>
+        <file>res/Soildier_coming.png</file>
     </qresource>
 </RCC>
