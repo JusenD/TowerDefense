@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
     //添加地图
-    the_map = new Map(this, 1);
+    the_map = new Map(this, 0);
     //根据地图设置窗口大小
     setFixedSize(70*the_map->get_colomn(), 70*the_map->get_row()+100);
 //    resize(1000, 700);

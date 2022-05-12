@@ -33,8 +33,6 @@ protected:
     Map* the_map = nullptr;
     int row_now = 0;
     int colomn_now = 0;
-signals:
-
 };
 
 class Grass : public Block{

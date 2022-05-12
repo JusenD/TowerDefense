@@ -38,7 +38,7 @@ void Block::mouseReleaseEvent(QMouseEvent *ev){
             ((MainWindow*)parent)->cancel_call_state();
         }
     }
-    else if(((MainWindow*)parent)->selected != nullptr){
+    else if(this->empty() && ((MainWindow*)parent)->selected != nullptr){
         add_defender(((MainWindow*)parent)->selected);
         if(((MainWindow*)parent)->selected->is_king()){
             ((MainWindow*)parent)->enter_call_state(this->row_now, this->colomn_now);
