@@ -34,6 +34,7 @@ struct amap{
 
 class Map
 {
+    static bool initialized;
     int source = 0;
     int ADD_ONCE = 50;
     int ADD_TIME = 4000;
