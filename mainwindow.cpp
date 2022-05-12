@@ -7,6 +7,7 @@
 #include"block.h"
 #include"selection.h"
 #include<QMovie>
+#include<QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
     //添加地图
-    the_map = new Map(this, 0);
+    the_map = new Map(this, 1);
     //根据地图设置窗口大小
     setFixedSize(70*the_map->get_colomn(), 70*the_map->get_row()+100);
 //    resize(1000, 700);
@@ -31,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     health_remain->move(0, 0);
     health_remain->setValue(*health);
     //显示资源
+    ui->menu->move(0, 70*the_map->get_row());
     display_source_health();
     //添加一个敌人
     the_map->add_enemy(this, 1, Enemy::Daida);
@@ -74,27 +76,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     //添加波吉 selection
     Selection *boji = new Selection(this, Defender::Boji);
-    boji->move(85, 705);
+    boji->move(85, 70*the_map->get_row() + 5);
     boji->show();
 
     //添加女巫 selection
     Selection *witch = new Selection(this, Defender::Witch);
-    witch->move(215, 705);
+    witch->move(215, 70*the_map->get_row() + 5);
     witch->show();
 
     //添加邪恶法师 selection
     Selection *evilWizard = new Selection(this, Defender::EvilWizard);
-    evilWizard->move(330, 705);
+    evilWizard->move(330, 70*the_map->get_row() + 5);
     evilWizard->show();
 
     //添加采集器 selection
     Selection *droid = new Selection(this, Defender::Droid);
-    droid->move(460, 705);
+    droid->move(460, 70*the_map->get_row() + 5);
     droid->show();
 
     //添加国王 selection
     Selection *king = new Selection(this, Defender::King);
-    king->move(590, 705);
+    king->move(590, 70*the_map->get_row() + 5);
     king->show();
 
     //尝试添加King

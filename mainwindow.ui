@@ -39,22 +39,6 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="spadeButton">
-     <property name="geometry">
-      <rect>
-       <x>960</x>
-       <y>10</y>
-       <width>81</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="mouseTracking">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
    </widget>
   </widget>
  </widget>
