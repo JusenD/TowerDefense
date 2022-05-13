@@ -5,6 +5,7 @@
 #include"map.h"
 #include<QMovie>
 #include<mainwindow.h>
+#include"healthbar.h"
 
 bool Enemy::all_enemy_access = true;
 //单独的删去敌人函数，避免同时删除bug
@@ -37,7 +38,7 @@ void Enemy::health_decrease(int n, int time){
 
 void cut_off(QLabel* gif, int time){
     QTimer::singleShot(time, [=](){
-        delete gif;
+        gif->deleteLater();
     });
 }
 
@@ -51,6 +52,18 @@ int Enemy::get_x(){
 
 int Enemy::get_y(){
     return this->y();
+}
+
+int Enemy::get_health(){
+    return this->health;
+}
+
+int Enemy::get_original_health(){
+    return this->original_health;
+}
+
+QLabel* Enemy::get_gif(){
+    return this->gif;
 }
 
 void Enemy::end(){
@@ -73,12 +86,24 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     x_now = this_path->way[step].x*70 + 70;
     y_now = this_path->way[step].y*70;
     this->move(x_now, y_now);
+    //初始化gif(为血条作准备)
+    gif = new QLabel;
+    gif->setParent(parent);
+    gif->resize(60, 90);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->show();
+    gif->move(x_now, y_now - 20);
+    //初始化血条
     this->health = 200;
+    this->original_health = health;
+    this->health_bar = new healthBar(this);
+    health_bar->move(6, 8);
     //初始化动画
     animation = new QPropertyAnimation(this, "geometry");
     animation1 = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(this, "geometry");
     animation3 = new QPropertyAnimation(this, "geometry");
+    animation4 = new QPropertyAnimation(this->gif, "geometry");
 }
 
 void Daida::start_move(){
@@ -123,19 +148,31 @@ void Daida::move_once(){
             animation1->stop();
             animation2->stop();
             animation3->stop();
+            animation4->stop();
             if(!block_now->empty()){
                 //设置时间间隔
                 animation->setDuration(1300);
+                animation4->setDuration(1300);
                 //设置起始位置
                 animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
                 x_now = this_path->way[step].x*70 + 35;
                 y_now = this_path->way[step].y*70;
                 //设置结束位置
                 animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
                 animation->setEasingCurve(QEasingCurve::InOutCubic);
                 animation->start();
+                animation4->setEndValue(QRect(x_now, y_now - 20, this->width(), this->height()));
+                animation4->setEasingCurve(QEasingCurve::InOutCubic);
+                animation4->start();
                 can_move = false;
                 QTimer::singleShot(1800, this, [=](){
+                    //保持血条的运动
+                    animation4->setDuration(999999);
+                    animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
+                    animation4->setEndValue(QRect(x_now+1, y_now- 20, this->width(), this->height()));
+                    animation4->setEasingCurve(QEasingCurve::InOutCubic);
+                    animation4->start();
                     stop_move();
                 });
 
@@ -143,14 +180,27 @@ void Daida::move_once(){
             else{
                 //设置时间间隔
                 animation->setDuration(1300);
+                animation4->setDuration(1300);
                 //设置起始位置
                 animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
                 x_now = this_path->way[step].x*70;
                 y_now = this_path->way[step].y*70;
                 //设置结束位置
                 animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
                 animation->setEasingCurve(QEasingCurve::InOutCubic);
                 animation->start();
+                animation4->setEndValue(QRect(x_now, y_now- 20, this->width(), this->height()));
+                animation4->setEasingCurve(QEasingCurve::InOutCubic);
+                animation4->start();
+                QTimer::singleShot(1800, this, [=](){
+                    //保持血条的运动
+                    animation4->setDuration(999999);
+                    animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
+                    animation4->setEndValue(QRect(x_now+1, y_now- 20, this->width(), this->height()));
+                    animation4->setEasingCurve(QEasingCurve::InOutCubic);
+                    animation4->start();
+                });
             }
         }
     }
@@ -197,6 +247,8 @@ void Daida::die(){
     can_move = false;
     //在所有敌人中删除该敌人
     delete_enemy();
+    this->health_bar->deleteLater();
+    this->gif->deleteLater();
     this->deleteLater();
 }
 
@@ -214,20 +266,24 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     this->parent = (MainWindow*)parent;
     this->this_path = &(*map->path)[which_path];
     this->step = step ? step : -1;
-    this->resize(60, 90);
+    this->setFixedSize(80, 70);
     this->map = map;
     x_now = this_path->way[step].x*70 + 70;
     y_now = this_path->way[step].y*70 - 30;
     this->move(x_now, y_now);
     this->health = 500;
+    this->original_health = health;
     //初始化gif
     gif = new QLabel;
     gif->setParent(parent);
-    gif->resize(60, 90);
+    gif->setFixedSize(120, 100);
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->setScaledContents(true);
     gif->hide();
-    gif->move(x_now, y_now);
+    gif->move(this->x()-50, this->y() - 10);
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->move(30, 8);
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -288,7 +344,7 @@ void Skeleton::move_once(){//3s完成线性的行走
             animation2->stop();
             //设置起始位置
             animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
-            animation2->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+            animation2->setStartValue(QRect(x_now-50, y_now-10, this->width(), this->height()));
             //设置终止位置
             if(!block_now->empty()){
                 //设置时间间隔
@@ -299,7 +355,7 @@ void Skeleton::move_once(){//3s完成线性的行走
                 animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
                 animation->setEasingCurve(QEasingCurve::Linear);
                 animation->start();
-                animation2->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation2->setEndValue(QRect(x_now-50, y_now-10, this->width(), this->height()));
                 animation2->setEasingCurve(QEasingCurve::Linear);
                 animation2->start();
                 can_move = false;
@@ -317,7 +373,7 @@ void Skeleton::move_once(){//3s完成线性的行走
                 animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
                 animation->setEasingCurve(QEasingCurve::Linear);
                 animation->start();
-                animation2->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation2->setEndValue(QRect(x_now-50, y_now-10, this->width(), this->height()));
                 animation2->setEasingCurve(QEasingCurve::Linear);
                 animation2->start();
             }
@@ -330,8 +386,6 @@ void Skeleton::attack(){
     if(unfinished){
         Defender* target = this->block_now->defender_in()->back();
         target->health_decrease(150, 900);
-        gif->resize(120, 100);
-        gif->move(this->x()-50, this->y() - 10);
         movie = new QMovie(":/res/SkeletonAttack.gif");
         gif->setMovie(movie);
         movie->start();
@@ -341,11 +395,10 @@ void Skeleton::attack(){
 
 void Skeleton::die(){
     can_move = false;
-//    gif->resize(60, 90);
     animation->stop();
     animation2->stop();
+    this->health_bar->deleteLater();
     delete_enemy();
-//    gif->resize(60, 90);
     movie = new QMovie(":/res/SkeletonDead.gif");
     movie->start();
     gif->setMovie(movie);
@@ -367,6 +420,7 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     y_now = this_path->way[step].y*70 - 30;
     this->move(x_now, y_now);
     this->health = 100;
+    this->original_health = health;
     //初始化gif
     gif = new QLabel;
     gif->setParent(parent);
@@ -375,6 +429,9 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->move(10, 7);
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -487,6 +544,7 @@ void Bat::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
+    this->health_bar->deleteLater();
     delete_enemy();
     movie = new QMovie(":/res/BatDeath.gif");
     movie->start();
@@ -508,6 +566,7 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     y_now = this_path->way[step].y*70 - 20;
     this->move(x_now, y_now);
     this->health = 400;
+    this->original_health = health;
     //初始化gif
     gif = new QLabel;
     gif->setParent(parent);
@@ -516,6 +575,8 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    //初始化血条
+    this->health_bar = new healthBar(this);
     //初始化anmiation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -609,6 +670,7 @@ void BlackWitch::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
+    this->health_bar->deleteLater();
     delete_enemy();
     movie = new QMovie(":/res/BlackWitchDead.gif");
     movie->start();

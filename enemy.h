@@ -8,6 +8,7 @@
 
 class MainWindow;
 class Map;
+class healthBar;
 class Enemy : public QWidget
 {
     Q_OBJECT
@@ -33,11 +34,15 @@ public:
     bool is_fly();
     int get_x();
     int get_y();
+    int get_health();
+    int get_original_health();
     void end();
     void delete_enemy();
     static bool all_enemy_access;
+    QLabel* get_gif();
 protected:
     //设置生命值
+    int original_health = 0;
     int health = 0;
     int damage = 0;
     bool can_move = true;
@@ -47,6 +52,9 @@ protected:
     MainWindow* parent = nullptr;
     Single_Path* this_path = nullptr;
     bool unfinished = true;
+    healthBar* health_bar;
+    QLabel* gif = nullptr;
+    QMovie* movie = nullptr;
 };
 
 class Ground_Enemy:public Enemy{
@@ -79,6 +87,7 @@ public:
     QPropertyAnimation *animation1 = nullptr;
     QPropertyAnimation *animation2 = nullptr;
     QPropertyAnimation *animation3 = nullptr;
+    QPropertyAnimation *animation4 = nullptr;
 };
 
 class Skeleton: public Ground_Enemy{
@@ -90,8 +99,7 @@ public:
     void attack();
     void die();
     void stop();
-    QLabel* gif = nullptr;
-    QMovie* movie = nullptr;
+
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
 };
@@ -105,8 +113,7 @@ public:
     void attack();
     void die();
     void stop();
-    QLabel* gif = nullptr;
-    QMovie* movie = nullptr;
+
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
 };
@@ -121,8 +128,7 @@ public:
     void start_call();
     void die();
     void stop();
-    QLabel* gif = nullptr;
-    QMovie* movie = nullptr;
+
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
     int which_path = 0;

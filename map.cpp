@@ -27,7 +27,7 @@ void  Map::init(){            //所有地图初始化
             //创建一张地图
             amap* single_map = new amap;;
             sscanf(buffer, "%d,%d,%d,%d,%d,%d", &single_map->health, &single_map->original_source, &single_map->source_speed, &single_map->add_once, &single_map->row, &single_map->colomn);
-            qDebug()<<single_map->health<<single_map->original_source<<single_map->source_speed<<single_map->add_once<<single_map->row<<single_map->colomn;
+ //           qDebug()<<single_map->health<<single_map->original_source<<single_map->source_speed<<single_map->add_once<<single_map->row<<single_map->colomn;
             //创建地图数组并清空
             single_map->array = new int[single_map->row * single_map->colomn];
             memset(single_map->array, 0, single_map->row*single_map->colomn*4);
@@ -50,7 +50,7 @@ void  Map::init(){            //所有地图初始化
                     y = atoi(a_way.substr(cut+1, j).c_str());
                     coordinate r(x, y);
                     way.push_back(r);
-                    qDebug()<<'('<<x<<','<<y<<')';
+//                    qDebug()<<'('<<x<<','<<y<<')';
                     i = j+1, j = a_way.find(',', j+1);
                     cut = a_way.find(' ', cut+1);
                 }
@@ -58,7 +58,7 @@ void  Map::init(){            //所有地图初始化
                 y = atoi(a_way.substr(cut+1).c_str());
                 coordinate r(x, y);
                 way.push_back(r);
-                qDebug()<<'('<<x<<','<<y<<')';
+//                qDebug()<<'('<<x<<','<<y<<')';
                 Single_Path* path = new Single_Path(way);
                 if(way_type == 1){
                     path->ground = true;

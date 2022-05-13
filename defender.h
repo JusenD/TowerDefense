@@ -6,6 +6,7 @@
 #include<QPropertyAnimation>
 
 class Block;
+class healthBar;
 class Defender : public QWidget
 {
     Q_OBJECT
@@ -15,6 +16,8 @@ public:
     explicit Defender(QWidget *parent = nullptr);
     virtual void add(Block* place);
     int get_cost();
+    int get_health();
+    int get_original_health();
     void health_decrease(int n, int time);
     virtual void die();
     bool is_fighter();
@@ -23,7 +26,9 @@ public:
     void remove_defender();
     void mouseReleaseEvent(QMouseEvent* event);
     void stop();
+    virtual QLabel* get_gif();
 protected:
+    int original_health = 0;
     int health = 0;
     int damage = 0;
     int cost = 0;
@@ -33,6 +38,9 @@ protected:
     Block* place;
     QWidget* parent;
     bool unfinished = true;
+    healthBar* health_bar;
+    QLabel *gif = nullptr;
+    QMovie* movie = nullptr;
 signals:
 
 };
@@ -48,7 +56,6 @@ public:
 
 class Witch : public Defender{
     int range = 300;
-    QLabel *gif = nullptr;
     QLabel *bang = nullptr;
     QLabel *range_circle = nullptr;
     bool bounce_out = false;
@@ -64,18 +71,16 @@ public:
 };
 
 class EvilWizard : public Defender{
-    QLabel *gif = nullptr;
-    QMovie* movie = nullptr;
+    QLabel* giff;
 public:
     explicit EvilWizard(QWidget *parent);
     void add(Block* place);
     void attack();
     void die();
+    QLabel* get_gif();
 };
 
 class Droid : public Defender{
-    QLabel *gif = nullptr;
-    QMovie* movie = nullptr;
 public:
     explicit Droid(QWidget *parent);
     void add(Block* place);
@@ -84,8 +89,6 @@ public:
 };
 
 class Soildier : public Defender{
-    QLabel *gif = nullptr;
-    QMovie* movie = nullptr;
     QPropertyAnimation* animation1 = nullptr;
     QPropertyAnimation* animation2 = nullptr;
 public:
@@ -96,8 +99,6 @@ public:
 };
 
 class King : public Defender{
-    QLabel *gif = nullptr;
-    QMovie* movie = nullptr;
     Block* target = nullptr;
 public:
     explicit King(QWidget *parent);

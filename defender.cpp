@@ -6,6 +6,7 @@
 #include"enemy.h"
 #include<QTimer>
 #include<QMovie>
+#include"healthbar.h"
 
 extern void cut_off(QLabel*, int num);
 Defender::Defender(QWidget *parent)
@@ -23,6 +24,18 @@ int Defender::get_cost(){
     return cost;
 }
 
+int Defender::get_health(){
+    return this->health;
+}
+
+int Defender::get_original_health(){
+    return this->original_health;
+}
+
+QLabel* Defender::get_gif(){
+    return this->gif;
+}
+
 void Defender::health_decrease(int n, int time){
     QTimer::singleShot(time, this, [=](){
         if(health>n) health-=n;
@@ -32,6 +45,7 @@ void Defender::health_decrease(int n, int time){
 
 void Defender::die(){
     this->place->delete_defender(this);
+    this->health_bar->deleteLater();
     this->deleteLater();
 }
 
@@ -66,6 +80,7 @@ Boji::Boji(QWidget *parent)
     this->parent = parent;
     this->resize(70, 70);
     this->health = 300;
+    this->original_health = health;
     this->damage = 0;
     this->cost = 100;
     this->fighter = true;
@@ -83,6 +98,16 @@ void Boji::add(Block* place){
     this->place = place;
     //设置自身位置(已经被添加到了所在Block的all_defender里
     this->move(place->x(), place->y());
+    this->gif = new QLabel(parent);
+    gif->setFixedSize(70, 100);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->move(place->x(), place->y() - 30);
+    gif->show();
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(5, 8);
     qDebug()<<place->x()<<place->y();
     this->show();
 //    this->attack();
@@ -147,8 +172,9 @@ Witch::Witch(QWidget *parent)
 {
 //    this->place = place;
     this->parent = parent;
-    this->resize(70, 100);
+    this->resize(70, 70);
     this->health = 100;
+    this->original_health = health;
     this->damage = 100;
     this->cost = 200;
     this->range = 300;
@@ -178,6 +204,10 @@ void Witch::add(Block* place){
     gif->setMovie(movie);
     movie->start();
     gif->show();
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(5, 8);
     //初始化range_circle
     range_circle = new QLabel(parent);
     range_circle->resize(0, 0);
@@ -204,6 +234,7 @@ void Witch::attack(){
         vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
         bool whether = false;
         int target = 0;
+        qDebug()<<health_bar->x()<<health_bar->y();
         //范围判定,只能攻击一个
         for(int i = 0; i < all_enemy->size(); i++){
             if(!(*all_enemy)[i]) continue;
@@ -313,6 +344,7 @@ void Witch::die(){
     QMovie* movie = new QMovie(":/res/die.gif");
     gif->setMovie(movie);
     movie->start();
+    this->health_bar->deleteLater();
     this->place->delete_defender(this);
     cut_off(gif, 1000);
     cut_off(bang, 1000);
@@ -338,13 +370,14 @@ EvilWizard::EvilWizard(QWidget *parent)
     this->parent = parent;
     this->resize(70, 70);
     this->health = 200;
+    this->original_health = health;
     this->damage = 100;
     this->cost = 300;
     this->fighter = true;
     //初始化gif Label
     gif = new QLabel;
     gif->setParent(parent);
-    gif->setFixedSize(300, 300);
+    gif->setFixedSize(200, 170);
     gif->setScaledContents(true);
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     movie = new QMovie(":/res/EvilWizardWait.gif");
@@ -355,14 +388,28 @@ EvilWizard::EvilWizard(QWidget *parent)
 //   this->move(place->x(), place->y());
 }
 
+QLabel* EvilWizard::get_gif(){
+    return this->giff;
+}
+
 void EvilWizard::add(Block* place){
     this->place = place;
     //设置自身位置(已经被添加到了所在Block的all_defender里
     this->move(place->x(), place->y());
     qDebug()<<place->x()<<place->y();
     this->show();
-    gif->move(place->x() - 120, place->y() - 140);
+    gif->move(place->x() - 30, place->y() - 95);
     gif->show();
+    //初始化血条
+    giff = new QLabel;
+    giff->setParent(parent);
+    giff->setFixedSize(100, 100);
+    giff->move(this->x(), this->y()-30);
+    giff->setAttribute(Qt::WA_TransparentForMouseEvents);
+    giff->show();
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(2, 8);
     this->attack();
 }
 
@@ -415,6 +462,7 @@ void EvilWizard::die(){
     QMovie* movie = new QMovie(":/res/EvilWizardDead.gif");
     gif->setMovie(movie);
     movie->start();
+    this->health_bar->deleteLater();
     this->place->delete_defender(this);
     cut_off(gif, 800);
     this->deleteLater();
@@ -427,6 +475,7 @@ Droid::Droid(QWidget *parent)
     this->parent = parent;
     this->resize(70, 70);
     this->health = 100;
+    this->original_health = health;
     this->damage = 0;
     this->cost = 100;
     this->fighter = true;
@@ -450,6 +499,10 @@ void Droid::add(Block* place){
     gif->setMovie(movie);
     movie->start();
     gif->show();
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(23, 8);
     this->attack();
 }
 
@@ -477,6 +530,7 @@ void Droid::die(){
     QMovie* movie = new QMovie(":/res/DroidDead.gif");
     gif->setMovie(movie);
     movie->start();
+    this->health_bar->deleteLater();
     this->place->delete_defender(this);
     cut_off(gif, 700);
     this->deleteLater();
@@ -488,6 +542,7 @@ Soildier::Soildier(QWidget *parent)
     this->parent = parent;
     this->resize(70, 70);
     this->health = 300;
+    this->original_health = health;
     this->damage = 30;
     this->cost = 0;
     this->fighter = true;
@@ -506,6 +561,10 @@ void Soildier::add(Block* place, int x_now, int y_now){
     gif->setMovie(movie);
     movie->start();
     gif->show();
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(5, 8);
     //设置移动动画
     animation1 = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -534,9 +593,9 @@ void Soildier::attack(){
         for(int i = 0; i < (&((MainWindow*)(this->parent))->the_map->all_enemy)->size(); i++){
             if((*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]&&(*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->block_now == this->place){
                 if((*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]&&(*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->is_ground()){
-                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 900);
-                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 1500);
-                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 2800);
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 600);
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 1400);
+                    (*(&((MainWindow*)(this->parent))->the_map->all_enemy))[i]->health_decrease(damage, 2400);
                     whether = true;
                     break;
                 }
@@ -565,6 +624,7 @@ void Soildier::die(){
     QMovie* movie = new QMovie(":/res/SoildierDead.gif");
     gif->setMovie(movie);
     movie->start();
+    this->health_bar->deleteLater();
     this->place->delete_defender(this);
     cut_off(gif, 3700);
     this->deleteLater();
@@ -577,6 +637,7 @@ King::King(QWidget *parent)
     this->parent = parent;
     this->resize(70, 70);
     this->health = 400;
+    this->original_health = health;
     this->damage = 0;
     this->cost = 800;
     this->fighter = false;
@@ -600,6 +661,10 @@ void King::add(Block* place){
     gif->setMovie(movie);
     movie->start();
     gif->show();
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->show();
+    health_bar->move(12, 0);
 }
 
 void King::setTarget(Block* target){
@@ -642,6 +707,7 @@ void King::die(){
     QMovie* movie = new QMovie(":/res/KingDeath.gif");
     gif->setMovie(movie);
     movie->start();
+    this->health_bar->deleteLater();
     this->place->delete_defender(this);
     cut_off(gif, 2500);
     this->deleteLater();

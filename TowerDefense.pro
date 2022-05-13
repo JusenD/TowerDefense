@@ -16,7 +16,8 @@ SOURCES += \
     mainwindow.cpp \
     map.cpp \
     path.cpp \
-    selection.cpp
+    selection.cpp \
+    healthbar.cpp
 
 HEADERS += \
     block.h \
@@ -25,7 +26,8 @@ HEADERS += \
     mainwindow.h \
     map.h \
     path.h \
-    selection.h
+    selection.h \
+    healthbar.h
 
 FORMS += \
     mainwindow.ui
