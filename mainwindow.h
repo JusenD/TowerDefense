@@ -5,6 +5,7 @@
 #include"map.h"
 #include"selection.h"
 #include<QProgressBar>
+#include"waves.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,6 +18,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent*);
     Map *the_map;
+    Waves* the_waves;
     ~MainWindow();
     void display_source_health();
     void set_select(Defender* selected, QString coming, Selection* selec_selection);

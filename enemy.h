@@ -15,7 +15,7 @@ class Enemy : public QWidget
     Q_OBJECT
 public:
     //枚举所有敌人种类
-    enum Enemies{Daida, Skeleton, Bat, BlackWitch};
+    enum Enemies{Daida, Bat, Skeleton, BlackWitch};
     //当前位置
     int x_now;
     int y_now;

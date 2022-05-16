@@ -17,6 +17,9 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
     //添加地图
     the_map = new Map(this, 0);
+    //添加敌人波数
+    the_waves = new Waves(the_map);
+    the_waves->stategy();
     //根据地图设置窗口大小
     setFixedSize(70*the_map->get_colomn(), 70*the_map->get_row()+100);
 //    resize(1000, 700);
@@ -38,41 +41,41 @@ MainWindow::MainWindow(QWidget *parent)
     });
     source_health_clk->start(100);
     ui->menu->move(0, 70*the_map->get_row());
-    //添加一个敌人
-    the_map->add_enemy(this, 1, Enemy::Daida);
+//    //添加一个敌人
+//    the_map->add_enemy(this, 1, Enemy::Daida);
 
-    //再添加一堆敌人
+//    //再添加一堆敌人
 
-    QTimer::singleShot(1000, this, [=](){
-        //the_map->add_enemy(this, 0, Enemy::Bat);
-    });
-    QTimer::singleShot(2000, this, [=](){
-        the_map->add_enemy(this, 1, Enemy::Skeleton);
-    });
-    QTimer::singleShot(3000, this, [=](){
-        //the_map->add_enemy(this, 0, Enemy::Bat);
-    });
-    QTimer::singleShot(4000, this, [=](){
-        the_map->add_enemy(this, 1, Enemy::Daida);
-    });
-    QTimer::singleShot(5000, this, [=](){
-        //the_map->add_enemy(this, 0, Enemy::Daida);
-    });
-    //尝试添加一个骷髅兵
-//    Daida* a_daida = new Daida(this, &(*the_map->path)[0], the_map);
-//    a_daida->start_move();
-//    Skeleton* a_skeleton = new Skeleton(this, &(*the_map->path)[0], the_map);
-//    a_skeleton->start_move();
-    the_map->add_enemy(this, 0, Enemy::Daida);
+//    QTimer::singleShot(1000, this, [=](){
+//        //the_map->add_enemy(this, 0, Enemy::Bat);
+//    });
+//    QTimer::singleShot(2000, this, [=](){
+//        the_map->add_enemy(this, 1, Enemy::Skeleton);
+//    });
+//    QTimer::singleShot(3000, this, [=](){
+//        //the_map->add_enemy(this, 0, Enemy::Bat);
+//    });
+//    QTimer::singleShot(4000, this, [=](){
+//        the_map->add_enemy(this, 1, Enemy::Daida);
+//    });
+//    QTimer::singleShot(5000, this, [=](){
+//        //the_map->add_enemy(this, 0, Enemy::Daida);
+//    });
+//    //尝试添加一个骷髅兵
+////    Daida* a_daida = new Daida(this, &(*the_map->path)[0], the_map);
+////    a_daida->start_move();
+////    Skeleton* a_skeleton = new Skeleton(this, &(*the_map->path)[0], the_map);
+////    a_skeleton->start_move();
+//    the_map->add_enemy(this, 0, Enemy::Daida);
 
-//    //尝试添加一个蝙蝠
-//    Bat* a_bat = new Bat(this, &(*the_map->path)[0], the_map);
-//    a_bat->start_move();
-   // the_map->add_enemy(this, 0, Enemy::Bat);
-    //尝试添加黑法师
-//    BlackWitch* a_blackWitch = new BlackWitch(this, 2, the_map);
-//    a_blackWitch->start_move();
-    the_map->add_enemy(this, 2, Enemy::BlackWitch);
+////    //尝试添加一个蝙蝠
+////    Bat* a_bat = new Bat(this, &(*the_map->path)[0], the_map);
+////    a_bat->start_move();
+//   // the_map->add_enemy(this, 0, Enemy::Bat);
+//    //尝试添加黑法师
+////    BlackWitch* a_blackWitch = new BlackWitch(this, 2, the_map);
+////    a_blackWitch->start_move();
+//    the_map->add_enemy(this, 2, Enemy::BlackWitch);
 
     //尝试添加收集器
     Droid* a_droid = new Droid(this);

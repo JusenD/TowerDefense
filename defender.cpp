@@ -266,22 +266,24 @@ void Witch::attack(){
             movie->start();
             gif->show();
             QTimer::singleShot(300, this, [=](){
-                this->enemy_x = (*all_enemy)[target]->x();
-                this->enemy_y = (*all_enemy)[target]->y();
-                bang->show();
-                QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
-                //设置时间间隔
-                animation->setDuration(800);
-                //设置起始位置
-                animation->setStartValue(QRect(bang->x(), bang->y(), bang->width(), bang->height()));
-                //设置结束位置
-                animation->setEndValue(QRect(enemy_x + 15, enemy_y + 25, bang->width(), bang->height()));
-                animation->setEasingCurve(QEasingCurve::InCubic);
-                animation->start();
-                QTimer::singleShot(850, this, [=](){
-                    bang->hide();
-                    bang->move(place->x()+35, place->y()-10);
-                });
+                if(target<(*all_enemy).size()){
+                    this->enemy_x = (*all_enemy)[target]->x();
+                    this->enemy_y = (*all_enemy)[target]->y();
+                    bang->show();
+                    QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
+                    //设置时间间隔
+                    animation->setDuration(800);
+                    //设置起始位置
+                    animation->setStartValue(QRect(bang->x(), bang->y(), bang->width(), bang->height()));
+                    //设置结束位置
+                    animation->setEndValue(QRect(enemy_x + 15, enemy_y + 25, bang->width(), bang->height()));
+                    animation->setEasingCurve(QEasingCurve::InCubic);
+                    animation->start();
+                    QTimer::singleShot(850, this, [=](){
+                        bang->hide();
+                        bang->move(place->x()+35, place->y()-10);
+                    });
+                }
             });
             QTimer::singleShot(700, this, [=](){
                 QMovie* movie = new QMovie(":/res/wait.gif");
