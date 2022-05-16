@@ -80,7 +80,7 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
     this->this_path = &(*map->path)[which_path];
-    this->step = step ? step : -1;
+    this->step = step -1;
     this->resize(70, 70);
     this->map = map;
     x_now = this_path->way[step].x*70 + 70;
@@ -104,33 +104,19 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     animation2 = new QPropertyAnimation(this, "geometry");
     animation3 = new QPropertyAnimation(this, "geometry");
     animation4 = new QPropertyAnimation(this->gif, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔2.5s走一步，2.5s攻击一次
+    move_clk->setInterval(2500);
+    attack_clk->setInterval(2500);
+    connect(move_clk, &QTimer::timeout, this, &Daida::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &Daida::attack);
 }
 
 void Daida::start_move(){
     move_once();
-    //每隔2s进行一次递归
-    QTimer::singleShot(2500, this, [=](){
-        if(unfinished && can_move) start_move();
-    });
-}
-
-void Daida::stop_move(){
-    if(unfinished && !can_move){
-        can_move = false;
-        if(!block_now->empty()){
-            attack();
-        }
-        //每隔2.5s进行一次递归攻击
-        QTimer::singleShot(2500, this, [=](){
-            if(block_now->empty()){
-                can_move = true;
-                start_move();
-            }
-            else {
-                stop_move();
-            }
-        });
-    }
+    move_clk->start();
 }
 
 void Daida::move_once(){
@@ -140,7 +126,7 @@ void Daida::move_once(){
         if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
-            end();
+            return end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
@@ -150,6 +136,8 @@ void Daida::move_once(){
             animation3->stop();
             animation4->stop();
             if(!block_now->empty()){
+                //停止移动
+                move_clk->stop();
                 //设置时间间隔
                 animation->setDuration(1300);
                 animation4->setDuration(1300);
@@ -173,7 +161,10 @@ void Daida::move_once(){
                     animation4->setEndValue(QRect(x_now+1, y_now- 20, this->width(), this->height()));
                     animation4->setEasingCurve(QEasingCurve::InOutCubic);
                     animation4->start();
-                    stop_move();
+ //                   stop_move();
+                    can_move = false;
+                    move_clk->stop();
+                    attack_clk->start();
                 });
 
             }
@@ -209,42 +200,51 @@ void Daida::move_once(){
 void Daida::attack(){       //一次攻击，攻击频率为 hz
     //游戏结束所有操作中断
     if(unfinished){
-        Defender* target = this->block_now->defender_in()->back();
-        target->health_decrease(50, 250);
-        //设置攻击动画
-        //设置时间间隔
-        animation1->setDuration(250);
-        //设置起始位置
-        animation1->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
-        //设置结束位置
-        animation1->setEndValue(QRect(x_now - 4, y_now - 7, this->width(), this->height()));
-        animation1->setEasingCurve(QEasingCurve::InOutCubic);
-        animation1->start();
-        QTimer::singleShot(250, this, [=](){
+        if(block_now->empty()){
+            attack_clk->stop();
+            move_clk->start();
+            return move_once();
+        }
+        else{
+            Defender* target = this->block_now->defender_in()->back();
+            target->health_decrease(50, 250);
+            //设置攻击动画
             //设置时间间隔
-            animation2->setDuration(150);
+            animation1->setDuration(250);
             //设置起始位置
-            animation2->setStartValue(QRect(x_now - 4, y_now - 7, this->width(), this->height()));
+            animation1->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
             //设置结束位置
-            animation2->setEndValue(QRect(x_now - 7, y_now, this->width(), this->height()));
-            animation2->setEasingCurve(QEasingCurve::InOutCubic);
-            animation2->start();
-            QTimer::singleShot(150, this, [=](){
+            animation1->setEndValue(QRect(x_now - 4, y_now - 7, this->width(), this->height()));
+            animation1->setEasingCurve(QEasingCurve::InOutCubic);
+            animation1->start();
+            QTimer::singleShot(250, this, [=](){
                 //设置时间间隔
-                animation3->setDuration(150);
+                animation2->setDuration(150);
                 //设置起始位置
-                animation3->setStartValue(QRect(x_now - 7, y_now, this->width(), this->height()));
+                animation2->setStartValue(QRect(x_now - 4, y_now - 7, this->width(), this->height()));
                 //设置结束位置
-                animation3->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
-                animation3->setEasingCurve(QEasingCurve::InOutCubic);
-                animation3->start();
+                animation2->setEndValue(QRect(x_now - 7, y_now, this->width(), this->height()));
+                animation2->setEasingCurve(QEasingCurve::InOutCubic);
+                animation2->start();
+                QTimer::singleShot(150, this, [=](){
+                    //设置时间间隔
+                    animation3->setDuration(150);
+                    //设置起始位置
+                    animation3->setStartValue(QRect(x_now - 7, y_now, this->width(), this->height()));
+                    //设置结束位置
+                    animation3->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+                    animation3->setEasingCurve(QEasingCurve::InOutCubic);
+                    animation3->start();
+                });
             });
-        });
+        }
     }
 }
 
 void Daida::die(){
     can_move = false;
+    move_clk->stop();
+    attack_clk->stop();
     //在所有敌人中删除该敌人
     delete_enemy();
     this->health_bar->deleteLater();
@@ -265,7 +265,7 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
     this->this_path = &(*map->path)[which_path];
-    this->step = step ? step : -1;
+    this->step = step -1;
     this->setFixedSize(80, 70);
     this->map = map;
     x_now = this_path->way[step].x*70 + 70;
@@ -287,42 +287,19 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔3s走一步，3s攻击一次
+    move_clk->setInterval(3000);
+    attack_clk->setInterval(3000);
+    connect(move_clk, &QTimer::timeout, this, &Skeleton::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &Skeleton::attack);
 }
 
 void Skeleton::start_move(){
     move_once();
-    //每隔3s进行一次递归
-    QTimer::singleShot(3000, this, [=](){
-        if(unfinished && can_move) start_move();
-    });
-}
-
-void Skeleton::stop_move(){
-    //游戏结束所有操作中断
-    if(unfinished){
-        movie = new QMovie(":/res/SkeletonIdle.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
-        if(!can_move){
-            can_move = false;
-            QTimer::singleShot(1500, this, [=](){
-                if(!block_now->empty()) attack();
-            });
-            //每隔3s进行一次递归攻击
-            QTimer::singleShot(3200, this, [=](){
-                gif->move(this->x()+4, this->y());
-                gif->resize(60, 90);
-                if(block_now->empty()){
-                    can_move = true;
-                    start_move();
-                }
-                else {
-                    stop_move();
-                }
-            });
-        }
-    }
+    move_clk->start();
 }
 
 void Skeleton::move_once(){//3s完成线性的行走
@@ -336,7 +313,7 @@ void Skeleton::move_once(){//3s完成线性的行走
         if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
-            end();
+            return end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
@@ -347,6 +324,7 @@ void Skeleton::move_once(){//3s完成线性的行走
             animation2->setStartValue(QRect(x_now-50, y_now-10, this->width(), this->height()));
             //设置终止位置
             if(!block_now->empty()){
+                move_clk->stop();
                 //设置时间间隔
                 animation->setDuration(1000);
                 animation2->setDuration(2500);
@@ -360,7 +338,11 @@ void Skeleton::move_once(){//3s完成线性的行走
                 animation2->start();
                 can_move = false;
                 QTimer::singleShot(2800, this, [=](){
-                    stop_move();
+                    movie = new QMovie(":/res/SkeletonIdle.gif");
+                    gif->setMovie(movie);
+                    movie->start();
+                    gif->show();
+                    attack_clk->start();
                 });
             }
             else{
@@ -384,16 +366,33 @@ void Skeleton::move_once(){//3s完成线性的行走
 void Skeleton::attack(){
     //游戏结束所有操作中断
     if(unfinished){
-        Defender* target = this->block_now->defender_in()->back();
-        target->health_decrease(150, 900);
-        movie = new QMovie(":/res/SkeletonAttack.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
+        if(block_now->empty()){
+            can_move = true;
+            attack_clk->stop();
+            move_clk->start();
+            return move_once();
+        }
+        else{
+            Defender* target = this->block_now->defender_in()->back();
+            target->health_decrease(150, 900);
+            movie = new QMovie(":/res/SkeletonAttack.gif");
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            QTimer::singleShot(1700, this, [=](){
+                gif->resize(60, 90);
+                movie = new QMovie(":/res/SkeletonIdle.gif");
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+            });
+        }
     }
 }
 
 void Skeleton::die(){
+    move_clk->stop();
+    attack_clk->stop();
     can_move = false;
     animation->stop();
     animation2->stop();
@@ -413,7 +412,7 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     this->setParent(parent);
     this->parent = (MainWindow*)parent;
     this->this_path = &(*map->path)[which_path];
-    this->step = step ? step : -1;
+    this->step = step-1;
     this->resize(70, 100);
     this->map = map;
     x_now = this_path->way[step].x*70 + 70;
@@ -435,40 +434,19 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔1.5s走一步，2s攻击一次
+    move_clk->setInterval(1500);
+    attack_clk->setInterval(2000);
+    connect(move_clk, &QTimer::timeout, this, &Bat::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &Bat::attack);
 }
 
 void Bat::start_move(){
     move_once();
-    //每隔1.5s进行一次递归
-    QTimer::singleShot(1500, this, [=](){
-        if(unfinished && can_move) start_move();
-    });
-}
-
-void Bat::stop_move(){
-    //游戏结束所有操作中断
-    if(unfinished){
-        movie = new QMovie(":/res/BatFly.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
-        if(!can_move){
-            can_move = false;
-            QTimer::singleShot(1600, this, [=](){
-                if(!block_now->empty()) attack();
-            });
-            //每隔2s进行一次递归攻击
-            QTimer::singleShot(2000, this, [=](){
-                if(block_now->empty()){
-                    can_move = true;
-                    start_move();
-                }
-                else {
-                    stop_move();
-                }
-            });
-        }
-    }
+    move_clk->start();
 }
 
 void Bat::move_once(){//3s完成线性的行走
@@ -482,7 +460,7 @@ void Bat::move_once(){//3s完成线性的行走
         if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
-            end();
+            return end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
@@ -493,6 +471,7 @@ void Bat::move_once(){//3s完成线性的行走
             animation2->setStartValue(QRect(x_now, y_now, gif->width(), gif->height()));
             //设置终止位置
             if(!block_now->empty()){
+                move_clk->stop();
                 //设置时间间隔
                 animation->setDuration(700);
                 animation2->setDuration(2000);
@@ -506,7 +485,7 @@ void Bat::move_once(){//3s完成线性的行走
                 animation2->start();
                 can_move = false;
                 QTimer::singleShot(2300, this, [=](){
-                    stop_move();
+                    attack_clk->start();
                 });
             }
             else{
@@ -531,16 +510,32 @@ void Bat::move_once(){//3s完成线性的行走
 void Bat::attack(){
     //游戏结束所有操作中断
     if(unfinished){
-        Defender* target = this->block_now->defender_in()->back();
-        target->health_decrease(50, 300);
-        movie = new QMovie(":/res/BatAttack.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
+        if(block_now->empty()){
+            can_move = true;
+            attack_clk->stop();
+            move_clk->start();
+            return move_once();
+        }
+        else{
+            Defender* target = this->block_now->defender_in()->back();
+            target->health_decrease(50, 300);
+            movie = new QMovie(":/res/BatAttack.gif");
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            QTimer::singleShot(400, this, [=](){
+                movie = new QMovie(":/res/BatFly.gif");
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+            });
+        }
     }
 }
 
 void Bat::die(){
+    move_clk->stop();
+    attack_clk->stop();
     can_move = false;
     animation->stop();
     animation2->stop();
@@ -559,7 +554,7 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     this->parent = (MainWindow*)parent;
     this->this_path = &(*map->path)[which_path];
     this->which_path = which_path;
-    this->step = step ? step : -1;
+    this->step = step -1;
     this->resize(70, 90);
     this->map = map;
     x_now = this_path->way[step].x*70 + 70;
@@ -580,29 +575,34 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     //初始化anmiation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔4s走一步，7s召唤一次
+    move_clk->setInterval(4000);
+    attack_clk->setInterval(7000);
+    connect(move_clk, &QTimer::timeout, this, &BlackWitch::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &BlackWitch::start_call);
 }
 
 void BlackWitch::start_move(){
-    if(!started) start_call();
+    movie = new QMovie(":/res/BlackWitchFly.gif");
+    gif->setMovie(movie);
+    movie->start();
+    gif->show();
     move_once();
-    //每隔4s进行一次递归，厌战且有召唤能力
-    QTimer::singleShot(4000, this, [=](){
-        if(unfinished && can_move) start_move();
-    });
+    move_clk->start();
+    attack_clk->start();
 }
 
 void BlackWitch::move_once(){
     //游戏结束所有操作中断
     if(unfinished){
-        movie = new QMovie(":/res/BlackWitchFly.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
         step++;
         if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
-            end();
+            return end();
         }
         else{
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
@@ -631,27 +631,23 @@ void BlackWitch::move_once(){
 void BlackWitch::start_call(){
     //游戏结束所有操作中断
     if(unfinished){
-        started = true;
-        QTimer::singleShot(7000, this, [=](){
-            //快到终点时不再召唤，不然会有未知bug
-            if(step + 1 < this_path->way.size()){
-                movie = new QMovie(":/res/BlackWitchCall.gif");
+        //快到终点时不再召唤，不然会有未知bug
+        if(step + 1 < this_path->way.size()){
+            movie = new QMovie(":/res/BlackWitchCall.gif");
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            //0.3s后召唤蝙蝠
+            QTimer::singleShot(300, this, [=](){
+                this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
+            });
+            QTimer::singleShot(500, this, [=](){
+                movie = new QMovie(":/res/BlackWitchFly.gif");
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
-                //0.3s后召唤蝙蝠
-                QTimer::singleShot(300, this, [=](){
-                    this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
-                });
-                QTimer::singleShot(500, this, [=](){
-                    movie = new QMovie(":/res/BlackWitchFly.gif");
-                    gif->setMovie(movie);
-                    movie->start();
-                    gif->show();
-                });
-                start_call();
-            }
-        });
+            });
+        }
     }
 }
 
@@ -667,6 +663,8 @@ void runaaaa(QLabel* gif, int time){
 }
 
 void BlackWitch::die(){
+    move_clk->stop();
+    attack_clk->stop();
     can_move = false;
     animation->stop();
     animation2->stop();
@@ -682,10 +680,6 @@ void BlackWitch::die(){
     runaaaa(gif, 700);
     cut_off(gif, 2200);
     this->deleteLater();
-}
-
-void BlackWitch::stop_move(){
-
 }
 
 void BlackWitch::attack(){

@@ -5,6 +5,7 @@
 #include"path.h"
 #include"block.h"
 #include<QPropertyAnimation>
+#include<QTimer>
 
 class MainWindow;
 class Map;
@@ -24,7 +25,6 @@ public:
     //-1表示未进场
     int step = -1;
     virtual void start_move() = 0;
-    virtual void stop_move() = 0;
     virtual void move_once() = 0;
     virtual void attack() = 0;
     void stop();
@@ -55,6 +55,9 @@ protected:
     healthBar* health_bar;
     QLabel* gif = nullptr;
     QMovie* movie = nullptr;
+    //时钟信号
+    QTimer* move_clk = nullptr;
+    QTimer* attack_clk = nullptr;
 };
 
 class Ground_Enemy:public Enemy{
@@ -78,7 +81,6 @@ public:
     explicit Daida(QWidget *parent, int which_path, Map* map, int step = 0);
     void paintEvent(QPaintEvent*);
     void start_move();
-    void stop_move();
     void move_once();
     void attack();
     void die();
@@ -94,7 +96,6 @@ class Skeleton: public Ground_Enemy{
 public:
     explicit Skeleton(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
-    void stop_move();
     void move_once();
     void attack();
     void die();
@@ -108,7 +109,6 @@ class Bat: public Fly_Enemy{
 public:
     explicit Bat(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
-    void stop_move();
     void move_once();
     void attack();
     void die();
@@ -122,17 +122,14 @@ class BlackWitch : public Fly_Enemy{
 public:
     explicit BlackWitch(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
-    void stop_move();
     void move_once();
     void attack();
     void start_call();
     void die();
     void stop();
-
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
     int which_path = 0;
-    bool started = false;
 };
 
 #endif // ENEMY_H

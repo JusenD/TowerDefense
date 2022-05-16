@@ -13,7 +13,7 @@ class Block : public QWidget
 public:
     friend Map;
     explicit Block(QWidget *parent, int colomn_now, int row_now);
-    void add_defender(Defender* single_defender);
+    bool add_defender(Defender* single_defender);
     void push_a_defender(Defender* single_defender);
     std::vector<Defender*>* defender_in();
     QLabel *coming_picture;

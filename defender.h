@@ -41,6 +41,8 @@ protected:
     healthBar* health_bar;
     QLabel *gif = nullptr;
     QMovie* movie = nullptr;
+    //时钟信号
+    QTimer* attack_clk = nullptr;
 signals:
 
 };

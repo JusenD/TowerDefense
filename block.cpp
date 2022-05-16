@@ -39,8 +39,8 @@ void Block::mouseReleaseEvent(QMouseEvent *ev){
         }
     }
     else if(this->empty() && ((MainWindow*)parent)->selected != nullptr){
-        add_defender(((MainWindow*)parent)->selected);
-        if(((MainWindow*)parent)->selected->is_king()){
+        bool ok = add_defender(((MainWindow*)parent)->selected);
+        if(ok && ((MainWindow*)parent)->selected->is_king()){
             ((MainWindow*)parent)->enter_call_state(this->row_now, this->colomn_now);
         }
         else{
@@ -85,13 +85,16 @@ bool Block::empty(){
     return this->all_defender.empty();
 }
 
-void Block::add_defender(Defender* single_defender){
+bool Block::add_defender(Defender* single_defender){
     if(type == "Road" && single_defender->is_fighter()){
         ((MainWindow*)(this->parent))->the_map->add_defender(this, single_defender);
+        return true;
     }
     else if(type == "Grass" && !single_defender->is_fighter()){
         ((MainWindow*)(this->parent))->the_map->add_defender(this, single_defender);
+        return true;
     }
+    return false;
 }
 
 void Block::push_a_defender(Defender* single_defender){

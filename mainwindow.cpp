@@ -32,8 +32,12 @@ MainWindow::MainWindow(QWidget *parent)
     health_remain->move(0, 0);
     health_remain->setValue(*health);
     //显示资源
+    QTimer* source_health_clk = new QTimer(this);
+    connect(source_health_clk, &QTimer::timeout, this, [=](){
+        display_source_health();
+    });
+    source_health_clk->start(100);
     ui->menu->move(0, 70*the_map->get_row());
-    display_source_health();
     //添加一个敌人
     the_map->add_enemy(this, 1, Enemy::Daida);
 
@@ -130,12 +134,9 @@ void MainWindow::paintEvent(QPaintEvent*){
     painter.drawPixmap(0, 70*the_map->get_row(), 1050, 100, pix);
 }
 
-void MainWindow::display_source_health(){ //递归调用每0.2s刷新显示资源（感觉这样做不太好，如果有某种捆绑表示最好）
+void MainWindow::display_source_health(){ //刷新显示资源
     ui->source->setText(to_string(the_map->get_source()).c_str());
     this->health_remain->setValue(*health);
-    QTimer::singleShot(200, this, [=](){
-        display_source_health();
-    });
 }
 
 QString MainWindow::get_coming(){

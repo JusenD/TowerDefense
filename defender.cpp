@@ -226,7 +226,13 @@ void Witch::add(Block* place){
     QMovie* bang_movie = new QMovie(":/res/bang.gif");
     bang->setMovie(bang_movie);
     bang_movie->start();
+    //初始化时钟
+    attack_clk = new QTimer(this);
+    //每隔3s攻击一次
+    attack_clk->setInterval(3000);
+    connect(attack_clk, &QTimer::timeout, this, &Witch::attack);
     this->attack();
+    attack_clk->start();
 }
 
 void Witch::attack(){
@@ -277,10 +283,6 @@ void Witch::attack(){
                 movie->start();
             });
         }
-        //递归调用
-        QTimer::singleShot(3000, this, [=](){
-            attack();
-        });
     }
 }
 
@@ -341,6 +343,7 @@ bool Witch::eventFilter(QObject *obj, QEvent *event){
 }
 
 void Witch::die(){
+    attack_clk->stop();
     QMovie* movie = new QMovie(":/res/die.gif");
     gif->setMovie(movie);
     movie->start();
@@ -384,7 +387,6 @@ EvilWizard::EvilWizard(QWidget *parent)
     movie->start();
     gif->setMovie(movie);
     gif->hide();
-
 //   this->move(place->x(), place->y());
 }
 
@@ -410,7 +412,13 @@ void EvilWizard::add(Block* place){
     this->health_bar = new healthBar(this);
     health_bar->show();
     health_bar->move(2, 8);
+    //初始化时钟
+    attack_clk = new QTimer(this);
+    //每隔3s攻击一次
+    attack_clk->setInterval(3000);
+    connect(attack_clk, &QTimer::timeout, this, &EvilWizard::attack);
     this->attack();
+    attack_clk->start();
 }
 
 //攻击
@@ -451,14 +459,11 @@ void EvilWizard::attack(){
                 gif->show();
             });
         }
-        //递归调用
-        QTimer::singleShot(3000, this, [=](){
-            attack();
-        });
     }
 }
 
 void EvilWizard::die(){
+    attack_clk->stop();
     QMovie* movie = new QMovie(":/res/EvilWizardDead.gif");
     gif->setMovie(movie);
     movie->start();
@@ -503,7 +508,12 @@ void Droid::add(Block* place){
     this->health_bar = new healthBar(this);
     health_bar->show();
     health_bar->move(23, 8);
-    this->attack();
+    //初始化时钟
+    attack_clk = new QTimer(this);
+    //每隔10s攻击一次
+    attack_clk->setInterval(10000);
+    connect(attack_clk, &QTimer::timeout, this, &Droid::attack);
+    attack_clk->start();
 }
 
 void Droid::attack(){
@@ -519,14 +529,11 @@ void Droid::attack(){
             movie->start();
             ((MainWindow*)parent)->the_map->add_source(50);
         });
-        //递归调用
-        QTimer::singleShot(10000, this, [=](){
-            attack();
-        });
     }
 }
 
 void Droid::die(){
+    attack_clk->stop();
     QMovie* movie = new QMovie(":/res/DroidDead.gif");
     gif->setMovie(movie);
     movie->start();
@@ -582,7 +589,13 @@ void Soildier::add(Block* place, int x_now, int y_now){
         gif->setMovie(movie);
         movie->start();
         gif->show();
+        //初始化时钟
+        attack_clk = new QTimer(this);
+        //每隔6s攻击一次
+        attack_clk->setInterval(6000);
+        connect(attack_clk, &QTimer::timeout, this, &Soildier::attack);
         this->attack();
+        attack_clk->start();
     });
 }
 
@@ -614,13 +627,11 @@ void Soildier::attack(){
                 gif->show();
             });
         }
-        QTimer::singleShot(6000, this, [=](){
-            attack();
-        });
     }
 }
 
 void Soildier::die(){
+    attack_clk->stop();
     QMovie* movie = new QMovie(":/res/SoildierDead.gif");
     gif->setMovie(movie);
     movie->start();
@@ -669,41 +680,44 @@ void King::add(Block* place){
 
 void King::setTarget(Block* target){
     this->target = target;
+    //初始化时钟
+    attack_clk = new QTimer(this);
+    //每隔15s攻击一次
+    attack_clk->setInterval(15000);
+    connect(attack_clk, &QTimer::timeout, this, &King::attack);
     this->attack();
+    attack_clk->start();
 }
 
 void King::attack(){
     if(unfinished){
         if(target && target->empty()){
-        //执行召唤动画
-        QMovie* movie = new QMovie(":/res/KingCall.gif");
-        gif->setMovie(movie);
-        movie->start();
-        gif->show();
-        QTimer::singleShot(2500, this, [=](){
-            //召唤皇家卫兵
-            if(target->empty()){
-                class::Soildier* a_soildier = new class::Soildier(parent);
-                target->push_a_defender(a_soildier);
-                a_soildier->move(target->x(), target->y());
-                a_soildier->add(target, this->x(), this->y());
-                ((MainWindow*)parent)->the_map->all_defender.push_back(a_soildier);
-            }
-        });
-        QTimer::singleShot(3000, this, [=](){
-            QMovie* movie = new QMovie(":/res/KingWait.gif");
+            //执行召唤动画
+            QMovie* movie = new QMovie(":/res/KingCall.gif");
             gif->setMovie(movie);
             movie->start();
-        });
+            gif->show();
+            QTimer::singleShot(2500, this, [=](){
+                //召唤皇家卫兵
+                if(target->empty()){
+                    class::Soildier* a_soildier = new class::Soildier(parent);
+                    target->push_a_defender(a_soildier);
+                    a_soildier->move(target->x(), target->y());
+                    a_soildier->add(target, this->x(), this->y());
+                    ((MainWindow*)parent)->the_map->all_defender.push_back(a_soildier);
+                }
+            });
+            QTimer::singleShot(3000, this, [=](){
+                QMovie* movie = new QMovie(":/res/KingWait.gif");
+                gif->setMovie(movie);
+                movie->start();
+            });
         }
-        //递归调用
-        QTimer::singleShot(15000, this, [=](){
-            attack();
-        });
     }
 }
 
 void King::die(){
+    attack_clk->stop();
     QMovie* movie = new QMovie(":/res/KingDeath.gif");
     gif->setMovie(movie);
     movie->start();
