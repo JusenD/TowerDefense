@@ -374,7 +374,7 @@ void Skeleton::attack(){
         }
         else{
             Defender* target = this->block_now->defender_in()->back();
-            target->health_decrease(150, 900);
+            target->health_decrease(150, 800);
             movie = new QMovie(":/res/SkeletonAttack.gif");
             gif->setMovie(movie);
             movie->start();
