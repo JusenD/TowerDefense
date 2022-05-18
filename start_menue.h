@@ -9,7 +9,8 @@ class Start_menue : public QMainWindow
     Q_OBJECT
 public:
     explicit Start_menue(QWidget *parent = nullptr);
-
+    void paintEvent(QPaintEvent* event);
+    MainWindow* challenge = nullptr;
 signals:
 
 public slots:

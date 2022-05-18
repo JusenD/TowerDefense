@@ -91,5 +91,14 @@
         <file>res/King_no.png</file>
         <file>res/King_selected.png</file>
         <file>res/Soildier_coming.png</file>
+        <file>res/start.jpg</file>
+        <file>res/start/start0.png</file>
+        <file>res/start/start1.png</file>
+        <file>res/start/start3.png</file>
+        <file>res/start/start4.png</file>
+        <file>res/start/start5.png</file>
+        <file>res/start/start6.png</file>
+        <file>res/start/start2.png</file>
+        <file>res/start/start7.png</file>
     </qresource>
 </RCC>

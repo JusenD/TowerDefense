@@ -98,6 +98,7 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     this->original_health = health;
     this->health_bar = new healthBar(this);
     health_bar->move(6, 8);
+    health_bar->show();
     //初始化动画
     animation = new QPropertyAnimation(this, "geometry");
     animation1 = new QPropertyAnimation(this, "geometry");
@@ -284,6 +285,7 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(30, 8);
+    health_bar->show();
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -431,6 +433,7 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(10, 7);
+    health_bar->show();
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -572,6 +575,7 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     gif->move(x_now, y_now);
     //初始化血条
     this->health_bar = new healthBar(this);
+    health_bar->show();
     //初始化anmiation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");

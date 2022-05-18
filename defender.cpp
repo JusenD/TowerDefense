@@ -245,7 +245,7 @@ void Witch::attack(){
     if(unfinished){
         vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
         bool whether = false;
-        int target = 0;
+        Enemy* target = 0;
         qDebug()<<health_bar->x()<<health_bar->y();
         //范围判定,只能攻击一个
         for(int i = 0; i < all_enemy->size(); i++){
@@ -255,7 +255,9 @@ void Witch::attack(){
             if(distance <= range*range){
                 (*all_enemy)[i]->health_decrease(damage, 1100);
                 whether = true;
-                target = i;
+                target = (*all_enemy)[i];
+                this->enemy_x = (*all_enemy)[i]->x();
+                this->enemy_y = (*all_enemy)[i]->y();
                 break;
             }
         }
@@ -266,9 +268,7 @@ void Witch::attack(){
             movie->start();
             gif->show();
             QTimer::singleShot(300, this, [=](){
-                if(target<(*all_enemy).size()){
-                    this->enemy_x = (*all_enemy)[target]->x();
-                    this->enemy_y = (*all_enemy)[target]->y();
+                if(target){
                     bang->show();
                     QPropertyAnimation *animation = new QPropertyAnimation(bang, "geometry");
                     //设置时间间隔
