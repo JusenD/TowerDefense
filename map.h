@@ -34,7 +34,6 @@ struct amap{
 
 class Map
 {
-    static bool initialized;
     int source = 0;
     int ADD_ONCE = 50;
     int ADD_TIME = 4000;
@@ -46,6 +45,8 @@ class Map
     bool have_not_defeat = true;
 public:
     static vector<amap> all;
+    static bool initialized;
+    static int map_cnt;
     static void init();
     Map(QWidget* parent, int num);
     int get_colomn();

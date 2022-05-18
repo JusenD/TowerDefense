@@ -11,6 +11,7 @@
 #include<QDebug>
 
 vector<amap> Map::all;
+int Map::map_cnt = 0;
 bool Map::initialized = false;
 void  Map::init(){            //所有地图初始化
     if(!initialized){
@@ -24,6 +25,7 @@ void  Map::init(){            //所有地图初始化
         //读取第一行中属性数据,health, original_source, source_speed, add_once, row, colomn
         all_maps.getline(buffer, 1000);
         while(!all_maps.eof()){
+            map_cnt++;
             //创建一张地图
             amap* single_map = new amap;;
             sscanf(buffer, "%d,%d,%d,%d,%d,%d", &single_map->health, &single_map->original_source, &single_map->source_speed, &single_map->add_once, &single_map->row, &single_map->colomn);

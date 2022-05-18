@@ -18,7 +18,8 @@ SOURCES += \
     path.cpp \
     selection.cpp \
     healthbar.cpp \
-    waves.cpp
+    waves.cpp \
+    start_menue.cpp
 
 HEADERS += \
     block.h \
@@ -29,7 +30,8 @@ HEADERS += \
     path.h \
     selection.h \
     healthbar.h \
-    waves.h
+    waves.h \
+    start_menue.h
 
 FORMS += \
     mainwindow.ui

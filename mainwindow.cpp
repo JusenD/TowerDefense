@@ -9,17 +9,14 @@
 #include<QMovie>
 #include<QDebug>
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(int which_map, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     centralWidget()->setAttribute(Qt::WA_TransparentForMouseEvents);
     //添加地图
-    the_map = new Map(this, 0);
-    //添加敌人波数
-    the_waves = new Waves(the_map);
-    the_waves->stategy();
+    the_map = new Map(this, which_map);
     //根据地图设置窗口大小
     setFixedSize(70*the_map->get_colomn(), 70*the_map->get_row()+100);
 //    resize(1000, 700);
@@ -142,6 +139,12 @@ void MainWindow::display_source_health(){ //刷新显示资源
     this->health_remain->setValue(*health);
 }
 
+void MainWindow::start_challenge(){
+    //添加敌人波数
+    the_waves = new Waves(the_map);
+    the_waves->stategy();
+}
+
 QString MainWindow::get_coming(){
     return coming;
 }
@@ -216,6 +219,10 @@ void MainWindow::cancel_call_state(){
     calling = false;
     coming = "";
     selected = nullptr;
+}
+
+void MainWindow::closeEvent(QCloseEvent* event){
+    emit be_closed();
 }
 
 MainWindow::~MainWindow()

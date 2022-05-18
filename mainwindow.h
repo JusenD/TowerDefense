@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(int which_map, QWidget *parent = nullptr);
     void paintEvent(QPaintEvent*);
     Map *the_map;
     Waves* the_waves;
@@ -33,6 +33,9 @@ public:
     void enter_call_state(int row, int colomn);
     void cancel_call_state();
     bool is_calling();
+    void start_challenge();
+signals:
+    void be_closed();
 private:
     Defender* selected = nullptr;
     QString coming = "";
@@ -45,6 +48,7 @@ private:
     bool calling = false;
     int call_row = 0;
     int call_colomn = 0;
+    void closeEvent(QCloseEvent* event);
 friend void Block::mouseReleaseEvent(QMouseEvent *ev);
 friend void Block::enterEvent(QEvent *event);
 };
