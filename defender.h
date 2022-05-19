@@ -27,6 +27,8 @@ public:
     void mouseReleaseEvent(QMouseEvent* event);
     void stop();
     virtual QLabel* get_gif();
+    static bool on_delete;
+    static void cut_off(QLabel* gif, int time);
 protected:
     int original_health = 0;
     int health = 0;

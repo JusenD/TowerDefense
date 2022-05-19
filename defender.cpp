@@ -8,9 +8,10 @@
 #include<QMovie>
 #include"healthbar.h"
 
-void cut_off(QLabel* gif, int time){
+bool Defender::on_delete = false;
+void Defender::cut_off(QLabel* gif, int time){
     QTimer::singleShot(time, [=](){
-        if(gif) gif->deleteLater();
+        if(!on_delete && gif) gif->deleteLater();
     });
 }
 

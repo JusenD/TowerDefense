@@ -19,11 +19,13 @@ Start_menue::Start_menue(QWidget *parent) : QMainWindow(parent)
             challenge = new MainWindow(i);
             this->hide();
             Enemy::on_delete = false;
+            Defender::on_delete = false;
             challenge->show();
             challenge->start_challenge();
             connect(challenge, &MainWindow::be_closed, [=](){
                 this->show();
                 Enemy::on_delete = true;
+                Defender::on_delete = true;
                 challenge->stop_challenge();
                 challenge->deleteLater();
             });

@@ -310,7 +310,9 @@ void Skeleton::start_move(){
 void Skeleton::move_once(){//3s完成线性的行走
     //游戏结束所有操作中断
     if(unfinished){
+        QMovie* former = movie;
         movie = new QMovie(":/res/SkeletonWalk.gif");
+        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
@@ -343,7 +345,9 @@ void Skeleton::move_once(){//3s完成线性的行走
                 animation2->start();
                 can_move = false;
                 QTimer::singleShot(2800, this, [=](){
+                    QMovie* former = movie;
                     movie = new QMovie(":/res/SkeletonIdle.gif");
+                    former->deleteLater();
                     gif->setMovie(movie);
                     movie->start();
                     gif->show();
@@ -380,13 +384,17 @@ void Skeleton::attack(){
         else{
             Defender* target = this->block_now->defender_in()->back();
             target->health_decrease(150, 800);
+            QMovie* former = movie;
             movie = new QMovie(":/res/SkeletonAttack.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
             QTimer::singleShot(1700, this, [=](){
                 gif->resize(60, 90);
+                QMovie* former = movie;
                 movie = new QMovie(":/res/SkeletonIdle.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
@@ -403,7 +411,9 @@ void Skeleton::die(){
     animation2->stop();
     this->health_bar->deleteLater();
     delete_enemy();
+    QMovie* former = movie;
     movie = new QMovie(":/res/SkeletonDead.gif");
+    former->deleteLater();
     movie->start();
     gif->setMovie(movie);
     gif->show();
@@ -458,7 +468,9 @@ void Bat::start_move(){
 void Bat::move_once(){//3s完成线性的行走
     //游戏结束所有操作中断
     if(unfinished){
+        QMovie* former = movie;
         movie = new QMovie(":/res/BatFly.gif");
+        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
@@ -525,12 +537,16 @@ void Bat::attack(){
         else{
             Defender* target = this->block_now->defender_in()->back();
             target->health_decrease(50, 300);
+            QMovie* former = movie;
             movie = new QMovie(":/res/BatAttack.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
             QTimer::singleShot(400, this, [=](){
+                QMovie* former = movie;
                 movie = new QMovie(":/res/BatFly.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
@@ -547,7 +563,9 @@ void Bat::die(){
     animation2->stop();
     this->health_bar->deleteLater();
     delete_enemy();
+    QMovie* former = movie;
     movie = new QMovie(":/res/BatDeath.gif");
+    former->deleteLater();
     movie->start();
     gif->setMovie(movie);
     gif->show();
@@ -593,7 +611,9 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
 
 void BlackWitch::start_move(){
     health_bar->show();
+    QMovie* former = movie;
     movie = new QMovie(":/res/BlackWitchFly.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     gif->show();
@@ -640,7 +660,9 @@ void BlackWitch::start_call(){
     if(unfinished){
         //快到终点时不再召唤，不然会有未知bug
         if(step + 1 < this_path->way.size()){
+            QMovie* former = movie;
             movie = new QMovie(":/res/BlackWitchCall.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
@@ -649,7 +671,9 @@ void BlackWitch::start_call(){
                 this->parent->the_map->add_enemy(parent, which_path, Enemies::Bat, step);
             });
             QTimer::singleShot(500, this, [=](){
+                QMovie* former = movie;
                 movie = new QMovie(":/res/BlackWitchFly.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
@@ -677,7 +701,9 @@ void BlackWitch::die(){
     animation2->stop();
     this->health_bar->deleteLater();
     delete_enemy();
+    QMovie* former = movie;
     movie = new QMovie(":/res/BlackWitchDead.gif");
+    former->deleteLater();
     movie->start();
     gif->resize(178, 252);
     gif->move(gif->x() - 48, gif->y() - 10 -162);

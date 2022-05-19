@@ -148,6 +148,13 @@ void MainWindow::start_challenge(){
 void MainWindow::stop_challenge(){
     the_waves->stop();
     the_waves->~Waves();
+    for(auto enemy : this->the_map->all_enemy){
+        enemy->get_gif()->deleteLater();
+        enemy->deleteLater();
+    }
+    for(auto block : this->the_map->all_block){
+        block->deleteLater();
+    }
 }
 
 QString MainWindow::get_coming(){
