@@ -40,6 +40,8 @@ public:
     void delete_enemy();
     static bool all_enemy_access;
     QLabel* get_gif();
+    static void cut_off(QLabel* gif, int time);
+    static bool on_delete;
 protected:
     //设置生命值
     int original_health = 0;

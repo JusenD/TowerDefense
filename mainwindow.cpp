@@ -145,6 +145,11 @@ void MainWindow::start_challenge(){
     the_waves->stategy();
 }
 
+void MainWindow::stop_challenge(){
+    the_waves->stop();
+    the_waves->~Waves();
+}
+
 QString MainWindow::get_coming(){
     return coming;
 }

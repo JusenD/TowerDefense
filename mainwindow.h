@@ -34,6 +34,7 @@ public:
     void cancel_call_state();
     bool is_calling();
     void start_challenge();
+    void stop_challenge();
 signals:
     void be_closed();
 private:

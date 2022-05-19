@@ -8,7 +8,12 @@
 #include<QMovie>
 #include"healthbar.h"
 
-extern void cut_off(QLabel*, int num);
+void cut_off(QLabel* gif, int time){
+    QTimer::singleShot(time, [=](){
+        if(gif) gif->deleteLater();
+    });
+}
+
 Defender::Defender(QWidget *parent)
     : QWidget{parent}
 {
@@ -206,7 +211,7 @@ void Witch::add(Block* place){
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->setScaledContents(true);
     gif->move(place->x(), place->y() - 30);
-    QMovie* movie = new QMovie(":/res/wait.gif");
+    movie = new QMovie(":/res/wait.gif");
     gif->setMovie(movie);
     movie->start();
     gif->show();
@@ -229,7 +234,7 @@ void Witch::add(Block* place){
     bang->move(this->x() + 35, this->y()-10);
     bang->setFixedSize(40, 40);
     bang->setScaledContents(true);
-    QMovie* bang_movie = new QMovie(":/res/bang.gif");
+    bang_movie = new QMovie(":/res/bang.gif");
     bang->setMovie(bang_movie);
     bang_movie->start();
     //初始化时钟
@@ -246,7 +251,6 @@ void Witch::attack(){
         vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
         bool whether = false;
         Enemy* target = 0;
-        qDebug()<<health_bar->x()<<health_bar->y();
         //范围判定,只能攻击一个
         for(int i = 0; i < all_enemy->size(); i++){
             if(!(*all_enemy)[i]) continue;
@@ -263,7 +267,9 @@ void Witch::attack(){
         }
         if(whether){
             //执行攻击动画
-            QMovie* movie = new QMovie(":/res/attack.gif");
+            QMovie* former = movie;
+            movie = new QMovie(":/res/attack.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
@@ -286,7 +292,9 @@ void Witch::attack(){
                 }
             });
             QTimer::singleShot(700, this, [=](){
-                QMovie* movie = new QMovie(":/res/wait.gif");
+                QMovie* former = movie;
+                movie = new QMovie(":/res/wait.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
             });
@@ -352,7 +360,9 @@ bool Witch::eventFilter(QObject *obj, QEvent *event){
 
 void Witch::die(){
     attack_clk->stop();
-    QMovie* movie = new QMovie(":/res/die.gif");
+    QMovie* former = movie;
+    movie = new QMovie(":/res/die.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
@@ -406,7 +416,6 @@ void EvilWizard::add(Block* place){
     this->place = place;
     //设置自身位置(已经被添加到了所在Block的all_defender里
     this->move(place->x(), place->y());
-    qDebug()<<place->x()<<place->y();
     this->show();
     gif->move(place->x() - 30, place->y() - 95);
     gif->show();
@@ -456,12 +465,16 @@ void EvilWizard::attack(){
         //设置攻击频率 为3s一次
         if(whether){
             //执行攻击动画
+            QMovie* former = movie;
             movie = new QMovie(":/res/EvilWizardAttack.gif");
+            former->deleteLater();
             movie->start();
             gif->setMovie(movie);
             gif->show();
             QTimer::singleShot(1000, this, [=](){
+                QMovie* former = movie;
                 movie = new QMovie(":/res/EvilWizardWait.gif");
+                former->deleteLater();
                 movie->start();
                 gif->setMovie(movie);
                 gif->show();
@@ -472,7 +485,9 @@ void EvilWizard::attack(){
 
 void EvilWizard::die(){
     attack_clk->stop();
-    QMovie* movie = new QMovie(":/res/EvilWizardDead.gif");
+    QMovie* former = movie;
+    movie = new QMovie(":/res/EvilWizardDead.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
@@ -508,7 +523,7 @@ void Droid::add(Block* place){
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->setScaledContents(true);
     gif->move(place->x()-35, place->y() - 25);
-    QMovie* movie = new QMovie(":/res/DroidWait.gif");
+    movie = new QMovie(":/res/DroidWait.gif");
     gif->setMovie(movie);
     movie->start();
     gif->show();
@@ -527,12 +542,16 @@ void Droid::add(Block* place){
 void Droid::attack(){
     if(unfinished){
         //执行充能动画
-        QMovie* movie = new QMovie(":/res/DroidAttack.gif");
+        QMovie* former = movie;
+        movie = new QMovie(":/res/DroidAttack.gif");
+        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
         QTimer::singleShot(1100, this, [=](){
-            QMovie* movie = new QMovie(":/res/DroidWait.gif");
+            QMovie* former = movie;
+            movie = new QMovie(":/res/DroidWait.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             ((MainWindow*)parent)->the_map->add_source(50);
@@ -542,7 +561,9 @@ void Droid::attack(){
 
 void Droid::die(){
     attack_clk->stop();
-    QMovie* movie = new QMovie(":/res/DroidDead.gif");
+    QMovie* former = movie;
+    movie = new QMovie(":/res/DroidDead.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
@@ -593,7 +614,9 @@ void Soildier::add(Block* place, int x_now, int y_now){
     this->show();
     QTimer::singleShot(2100, this, [=](){
         //显示等待动画
+        QMovie* former = movie;
         movie = new QMovie(":/res/SoildierWait.gif");
+        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
@@ -623,13 +646,17 @@ void Soildier::attack(){
             }
         }
         if(whether){
+            QMovie* former = movie;
             movie = new QMovie(":/res/SoildierAttack.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
             QTimer::singleShot(3000, this, [=](){
                 //显示等待动画
+                QMovie* former = movie;
                 movie = new QMovie(":/res/SoildierWait.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
                 gif->show();
@@ -640,7 +667,9 @@ void Soildier::attack(){
 
 void Soildier::die(){
     attack_clk->stop();
-    QMovie* movie = new QMovie(":/res/SoildierDead.gif");
+    QMovie* former = movie;
+    movie = new QMovie(":/res/SoildierDead.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
@@ -676,7 +705,7 @@ void King::add(Block* place){
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->setScaledContents(true);
     gif->move(place->x()-15, place->y()-10);
-    QMovie* movie = new QMovie(":/res/KingWait.gif");
+    movie = new QMovie(":/res/KingWait.gif");
     gif->setMovie(movie);
     movie->start();
     gif->show();
@@ -701,7 +730,9 @@ void King::attack(){
     if(unfinished){
         if(target && target->empty()){
             //执行召唤动画
-            QMovie* movie = new QMovie(":/res/KingCall.gif");
+            QMovie* former = movie;
+            movie = new QMovie(":/res/KingCall.gif");
+            former->deleteLater();
             gif->setMovie(movie);
             movie->start();
             gif->show();
@@ -716,7 +747,9 @@ void King::attack(){
                 }
             });
             QTimer::singleShot(3000, this, [=](){
-                QMovie* movie = new QMovie(":/res/KingWait.gif");
+                QMovie* former = movie;
+                movie = new QMovie(":/res/KingWait.gif");
+                former->deleteLater();
                 gif->setMovie(movie);
                 movie->start();
             });
@@ -726,7 +759,9 @@ void King::attack(){
 
 void King::die(){
     attack_clk->stop();
-    QMovie* movie = new QMovie(":/res/KingDeath.gif");
+    QMovie* former = movie;
+    movie = new QMovie(":/res/KingDead.gif");
+    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();

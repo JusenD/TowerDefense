@@ -7,6 +7,7 @@
 #include<mainwindow.h>
 #include"healthbar.h"
 
+bool Enemy::on_delete = false;
 bool Enemy::all_enemy_access = true;
 //单独的删去敌人函数，避免同时删除bug
 void Enemy::delete_enemy(){
@@ -36,9 +37,11 @@ void Enemy::health_decrease(int n, int time){
     });
 }
 
-void cut_off(QLabel* gif, int time){
+void Enemy::cut_off(QLabel* gif, int time){
     QTimer::singleShot(time, [=](){
-        gif->deleteLater();
+        if(!on_delete){
+            if(gif) gif->deleteLater();
+        }
     });
 }
 
@@ -98,7 +101,6 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     this->original_health = health;
     this->health_bar = new healthBar(this);
     health_bar->move(6, 8);
-    health_bar->show();
     //初始化动画
     animation = new QPropertyAnimation(this, "geometry");
     animation1 = new QPropertyAnimation(this, "geometry");
@@ -116,6 +118,7 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
 }
 
 void Daida::start_move(){
+    health_bar->show();
     move_once();
     move_clk->start();
 }
@@ -285,7 +288,6 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(30, 8);
-    health_bar->show();
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -300,6 +302,7 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
 }
 
 void Skeleton::start_move(){
+    health_bar->show();
     move_once();
     move_clk->start();
 }
@@ -433,7 +436,6 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(10, 7);
-    health_bar->show();
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -448,6 +450,7 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
 }
 
 void Bat::start_move(){
+    health_bar->show();
     move_once();
     move_clk->start();
 }
@@ -575,7 +578,6 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     gif->move(x_now, y_now);
     //初始化血条
     this->health_bar = new healthBar(this);
-    health_bar->show();
     //初始化anmiation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -590,6 +592,7 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
 }
 
 void BlackWitch::start_move(){
+    health_bar->show();
     movie = new QMovie(":/res/BlackWitchFly.gif");
     gif->setMovie(movie);
     movie->start();

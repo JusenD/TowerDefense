@@ -12,10 +12,12 @@ class Waves
     Map* the_map = nullptr;
     QTimer* clk = nullptr;
     QTimer* clk_internal = nullptr;
+    QTimer* NO_END = nullptr;
 public:
     Waves(Map* the_map);
     void start(int add_once, int time_interval, int max_level_enemy);
     void stategy();
+    void stop();
 };
 
 #endif // WAVES_H

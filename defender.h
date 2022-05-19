@@ -60,6 +60,7 @@ class Witch : public Defender{
     int range = 300;
     QLabel *bang = nullptr;
     QLabel *range_circle = nullptr;
+    QMovie *bang_movie = nullptr;
     bool bounce_out = false;
     QPropertyAnimation *animation1 = nullptr;
     QPropertyAnimation *animation2 = nullptr;

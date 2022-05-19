@@ -47,7 +47,7 @@ void Waves::stategy(){
 //                clk->stop();
 //                clk_internal->stop();
                 start(4, 10000, 4);
-                QTimer* NO_END = new QTimer();
+                NO_END = new QTimer();
                 add_once = 5;
                 QObject::connect(NO_END, &QTimer::timeout, [=](){
 //                    clk->stop();
@@ -59,5 +59,10 @@ void Waves::stategy(){
             });
         });
     });
+}
+
+void Waves::stop(){
+    clk->stop();
+    if(NO_END) NO_END->stop();
 }
 
