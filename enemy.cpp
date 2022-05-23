@@ -37,11 +37,12 @@ void Enemy::health_decrease(int n, int time){
     });
 }
 
-void Enemy::cut_off(QLabel* gif, int time){
+void Enemy::cut_off(QLabel* gif,QMovie* movie, int time){
     QTimer::singleShot(time, [=](){
         if(!on_delete){
             if(gif) gif->deleteLater();
         }
+        if (movie) movie->deleteLater();
     });
 }
 
@@ -249,8 +250,26 @@ void Daida::die(){
     can_move = false;
     move_clk->stop();
     attack_clk->stop();
+    animation->deleteLater();
+    animation1->deleteLater();
+    animation2->deleteLater();
+    animation3->deleteLater();
+    animation4->deleteLater();
     //在所有敌人中删除该敌人
     delete_enemy();
+    this->health_bar->deleteLater();
+    this->gif->deleteLater();
+    this->deleteLater();
+}
+
+void Daida::delete_now() {
+    move_clk->stop();
+    attack_clk->stop();
+    animation->deleteLater();
+    animation1->deleteLater();
+    animation2->deleteLater();
+    animation3->deleteLater();
+    animation4->deleteLater();
     this->health_bar->deleteLater();
     this->gif->deleteLater();
     this->deleteLater();
@@ -285,6 +304,7 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(this->x()-50, this->y() - 10);
+    movie = new QMovie(":/res/SkeletonWalk.gif");
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(30, 8);
@@ -310,9 +330,6 @@ void Skeleton::start_move(){
 void Skeleton::move_once(){//3s完成线性的行走
     //游戏结束所有操作中断
     if(unfinished){
-        QMovie* former = movie;
-        movie = new QMovie(":/res/SkeletonWalk.gif");
-        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
@@ -379,6 +396,9 @@ void Skeleton::attack(){
             can_move = true;
             attack_clk->stop();
             move_clk->start();
+            QMovie* former = movie;
+            movie = new QMovie(":/res/SkeletonWalk.gif");
+            former->deleteLater();
             return move_once();
         }
         else{
@@ -409,6 +429,8 @@ void Skeleton::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
     this->health_bar->deleteLater();
     delete_enemy();
     QMovie* former = movie;
@@ -417,10 +439,23 @@ void Skeleton::die(){
     movie->start();
     gif->setMovie(movie);
     gif->show();
-    cut_off(gif, 1400);
+    cut_off(gif,movie, 1400);
     this->deleteLater();
 }
 
+void Skeleton::delete_now() {
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    movie->deleteLater();
+    gif->deleteLater();
+    this->deleteLater();
+}
 
 //蝙蝠
 Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
@@ -443,6 +478,7 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    movie = new QMovie(":/res/BatFly.gif");
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(10, 7);
@@ -468,9 +504,6 @@ void Bat::start_move(){
 void Bat::move_once(){//3s完成线性的行走
     //游戏结束所有操作中断
     if(unfinished){
-        QMovie* former = movie;
-        movie = new QMovie(":/res/BatFly.gif");
-        former->deleteLater();
         gif->setMovie(movie);
         movie->start();
         gif->show();
@@ -508,8 +541,7 @@ void Bat::move_once(){//3s完成线性的行走
             }
             else{
                 //设置时间间隔
-                animation->setDuration(
-                            800);
+                animation->setDuration(800);
                 animation2->setDuration(1500);
                 x_now = this_path->way[step].x*70;
                 y_now = this_path->way[step].y*70 - 30;
@@ -561,6 +593,8 @@ void Bat::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
     this->health_bar->deleteLater();
     delete_enemy();
     QMovie* former = movie;
@@ -569,8 +603,21 @@ void Bat::die(){
     movie->start();
     gif->setMovie(movie);
     gif->show();
-    cut_off(gif, 1100);
+    cut_off(gif,movie, 1100);
     this->deleteLater();
+}
+
+void Bat::delete_now() {
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    movie->deleteLater();
+    gif->deleteLater();
 }
 
 BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
@@ -594,6 +641,7 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
     gif->setScaledContents(true);
     gif->hide();
     gif->move(x_now, y_now);
+    movie = new QMovie(":/res/BlackWitchFly.gif");
     //初始化血条
     this->health_bar = new healthBar(this);
     //初始化anmiation
@@ -611,9 +659,6 @@ BlackWitch::BlackWitch(QWidget *parent, int which_path, Map* map, int step){
 
 void BlackWitch::start_move(){
     health_bar->show();
-    QMovie* former = movie;
-    movie = new QMovie(":/res/BlackWitchFly.gif");
-    former->deleteLater();
     gif->setMovie(movie);
     movie->start();
     gif->show();
@@ -699,6 +744,8 @@ void BlackWitch::die(){
     can_move = false;
     animation->stop();
     animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
     this->health_bar->deleteLater();
     delete_enemy();
     QMovie* former = movie;
@@ -711,7 +758,21 @@ void BlackWitch::die(){
     gif->show();
     //设置逃离动画
     runaaaa(gif, 700);
-    cut_off(gif, 2200);
+    cut_off(gif,movie, 2200);
+    this->deleteLater();
+}
+
+void BlackWitch::delete_now() {
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    movie->deleteLater();
+    gif->deleteLater();
     this->deleteLater();
 }
 

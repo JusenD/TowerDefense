@@ -332,7 +332,7 @@ void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
             a_enemy->start_move();
             this->all_enemy.push_back(a_enemy);
         }
-        else a_enemy->~Enemy();
+        else a_enemy->delete_now();
     }
 }
 

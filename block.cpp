@@ -10,6 +10,7 @@ Block::Block(QWidget *parent, int colomn_now, int row_now)
     : QWidget{parent}
 {
     this->parent = parent;
+    this->setParent(parent);
     this->setFixedSize(70, 70);
     //初始化coming_picture
     coming_picture = new QLabel(parent);

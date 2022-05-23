@@ -27,6 +27,7 @@ public:
     virtual void start_move() = 0;
     virtual void move_once() = 0;
     virtual void attack() = 0;
+    virtual void delete_now() = 0;
     void stop();
     void health_decrease(int n, int time);
     virtual void die() = 0;
@@ -40,7 +41,7 @@ public:
     void delete_enemy();
     static bool all_enemy_access;
     QLabel* get_gif();
-    static void cut_off(QLabel* gif, int time);
+    static void cut_off(QLabel* gif,QMovie* movie, int time);
     static bool on_delete;
 protected:
     //设置生命值
@@ -60,6 +61,8 @@ protected:
     //时钟信号
     QTimer* move_clk = nullptr;
     QTimer* attack_clk = nullptr;
+    QPropertyAnimation* animation = nullptr;
+    QPropertyAnimation* animation2 = nullptr;
 };
 
 class Ground_Enemy:public Enemy{
@@ -87,9 +90,8 @@ public:
     void attack();
     void die();
     void stop();
-    QPropertyAnimation *animation = nullptr;
+    void delete_now();
     QPropertyAnimation *animation1 = nullptr;
-    QPropertyAnimation *animation2 = nullptr;
     QPropertyAnimation *animation3 = nullptr;
     QPropertyAnimation *animation4 = nullptr;
 };
@@ -102,9 +104,7 @@ public:
     void attack();
     void die();
     void stop();
-
-    QPropertyAnimation* animation = nullptr;
-    QPropertyAnimation* animation2 = nullptr;
+    void delete_now();
 };
 
 class Bat: public Fly_Enemy{
@@ -115,9 +115,7 @@ public:
     void attack();
     void die();
     void stop();
-
-    QPropertyAnimation* animation = nullptr;
-    QPropertyAnimation* animation2 = nullptr;
+    void delete_now();
 };
 
 class BlackWitch : public Fly_Enemy{
@@ -129,8 +127,7 @@ public:
     void start_call();
     void die();
     void stop();
-    QPropertyAnimation* animation = nullptr;
-    QPropertyAnimation* animation2 = nullptr;
+    void delete_now();
     int which_path = 0;
 };
 

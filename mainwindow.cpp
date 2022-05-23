@@ -74,10 +74,6 @@ MainWindow::MainWindow(int which_map, QWidget *parent)
 ////    a_blackWitch->start_move();
 //    the_map->add_enemy(this, 2, Enemy::BlackWitch);
 
-    //尝试添加收集器
-    Droid* a_droid = new Droid(this);
-    the_map->all_block[23]->add_defender(a_droid);
-
     //添加波吉 selection
     Selection *boji = new Selection(this, Defender::Boji);
     boji->move(85, 70*the_map->get_row() + 5);
@@ -147,12 +143,11 @@ void MainWindow::start_challenge(){
 
 void MainWindow::stop_challenge(){
     the_waves->stop();
-    the_waves->~Waves();
-    for(auto enemy : this->the_map->all_enemy){
-        enemy->get_gif()->deleteLater();
-        enemy->deleteLater();
+    delete the_waves;
+    for (auto enemy : the_map->all_enemy) {
+        enemy->delete_now();
     }
-    for(auto block : this->the_map->all_block){
+    for (auto block : the_map->all_block) {
         block->deleteLater();
     }
 }
