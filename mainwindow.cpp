@@ -147,6 +147,9 @@ void MainWindow::stop_challenge(){
     for (auto enemy : the_map->all_enemy) {
         enemy->delete_now();
     }
+    for(auto defender : the_map->all_defender){
+        defender->delete_now();
+    }
     for (auto block : the_map->all_block) {
         block->deleteLater();
     }
@@ -172,6 +175,10 @@ bool MainWindow::can_remove(){
 
 Selection* MainWindow::get_selection(){
     return select_selection;
+}
+
+Map* MainWindow::get_map(){
+    return the_map;
 }
 
 void MainWindow::set_select(Defender* selected, QString coming, Selection* selec_selection){

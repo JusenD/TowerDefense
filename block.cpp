@@ -45,11 +45,14 @@ void Block::mouseReleaseEvent(QMouseEvent *ev){
             ((MainWindow*)parent)->enter_call_state(this->row_now, this->colomn_now);
         }
         else{
+            if (!ok)((MainWindow*)parent)->selected->deleteLater();
             ((MainWindow*)parent)->selected = nullptr;
             ((MainWindow*)parent)->coming = "";
         }
     }
-    if(((MainWindow*)parent)->select_selection) emit ((MainWindow*)parent)->select_selection->mouseReleaseEvent(ev);
+    if (((MainWindow*)parent)->select_selection) {
+        emit((MainWindow*)parent)->select_selection->mouseReleaseEvent(ev);
+    }
 }
 
 //绘制即将选中的悬停效果

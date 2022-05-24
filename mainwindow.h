@@ -27,6 +27,7 @@ public:
     QString get_coming();
     Defender* get_selected();
     Selection* get_selection();
+    Map* get_map();
     void set_spade(QLabel* spade);
     void change_remove(bool whether);
     bool can_remove();
