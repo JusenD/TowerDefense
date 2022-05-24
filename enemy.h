@@ -15,7 +15,7 @@ class Enemy : public QWidget
     Q_OBJECT
 public:
     //枚举所有敌人种类
-    enum Enemies{Daida, Bat, Skeleton, BlackWitch};
+    enum Enemies{Daida, Bat, Skeleton, BlackWitch, Bot};
     //当前位置
     int x_now;
     int y_now;
@@ -51,7 +51,7 @@ protected:
     bool can_move = true;
     bool ground = false;
     bool fly = false;
-    bool dead = false;
+    bool has_dead = false;
     MainWindow* parent = nullptr;
     Single_Path* this_path = nullptr;
     bool unfinished = true;
@@ -129,6 +129,20 @@ public:
     void stop();
     void delete_now();
     int which_path = 0;
+};
+
+class Bot : public Ground_Enemy{
+    QLabel* bullet = nullptr;
+    QPropertyAnimation* animation3 = nullptr;
+public:
+    explicit Bot(QWidget *parent, int which_path, Map* map, int step = 0);
+    void start_move();
+    void move_once();
+    void attack();
+    void die();
+    void stop();
+    void delete_now();
+    Defender* find_target();
 };
 
 #endif // ENEMY_H

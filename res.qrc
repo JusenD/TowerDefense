@@ -99,5 +99,12 @@
         <file>res/start/start6.png</file>
         <file>res/start/start2.png</file>
         <file>res/start/start7.png</file>
+        <file>res/BotAttack.gif</file>
+        <file>res/BotCharge.gif</file>
+        <file>res/BotDashL.gif</file>
+        <file>res/BotDashR.gif</file>
+        <file>res/BotDead.gif</file>
+        <file>res/BotWalk.gif</file>
+        <file>res/bullet.png</file>
     </qresource>
 </RCC>

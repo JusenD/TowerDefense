@@ -34,17 +34,17 @@ void Waves::stategy(){
     QTimer::singleShot(25000, this->clk, [=](){
         start(2, 10000, 1);
         QTimer::singleShot(25000, this->clk, [=](){
-            start(3, 10000, 2);
+            start(3, 10000, 5);
             QTimer::singleShot(25000, this->clk, [=](){
-                start(3, 10000, 3);
+                start(3, 10000, 5);
             });
             QTimer::singleShot(30000, this->clk, [=](){
 
-                start(4, 10000, 4);
+                start(4, 10000, 5);
                 NO_END = new QTimer();
                 add_once = 5;
                 QObject::connect(NO_END, &QTimer::timeout, [=](){
-                    start(add_once, 10000, 4);
+                    start(add_once, 10000, 5);
                     add_once++;
                 });
                 NO_END->start(25000);

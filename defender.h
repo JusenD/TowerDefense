@@ -40,6 +40,7 @@ protected:
     bool fighter = false;
     bool tower = false;
     bool king = false;
+    bool has_dead = false;
     Block* place;
     QWidget* parent;
     bool unfinished = true;

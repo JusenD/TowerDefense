@@ -33,7 +33,7 @@ void Enemy::delete_enemy(){
 void Enemy::health_decrease(int n, int time){
     QTimer::singleShot(time, this, [=](){
         if(health>n) health-=n;
-        else if(!dead){die(); dead = true;}
+        else if(!has_dead){die(); has_dead = true;}
     });
 }
 
@@ -778,6 +778,226 @@ void BlackWitch::delete_now() {
 
 void BlackWitch::attack(){
 
+}
+
+Bot::Bot(QWidget *parent, int which_path, Map* map, int step){
+    this->setParent(parent);
+    this->parent = (MainWindow*)parent;
+    this->this_path = &(*map->path)[which_path];
+    this->step = step-1;
+    this->setFixedSize(70, 70);
+    this->map = map;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70;
+    this->move(x_now, y_now);
+    this->health = 500;
+    this->original_health = health;
+    //初始化gif
+    gif = new QLabel;
+    gif->setParent(parent);
+    gif->resize(315, 70);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->hide();
+    gif->move(x_now - 215, y_now);
+    movie = new QMovie(":/res/BotWalk.gif");
+    gif->setMovie(movie);
+    bullet = new QLabel(parent);
+    QPixmap pix(":/res/bullet.png");
+    bullet->setFixedSize(35, 5);
+    bullet->setScaledContents(true);
+    bullet->setAttribute(Qt::WA_TransparentForMouseEvents);
+    bullet->hide();
+    bullet->setPixmap(pix);
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->move(115, 0);
+    //初始化animation
+    animation = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
+    animation3 = new QPropertyAnimation(bullet, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔5s走一步，4s攻击一次
+    move_clk->setInterval(5000);
+    attack_clk->setInterval(4000);
+    connect(move_clk, &QTimer::timeout, this, &Bot::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &Bot::attack);
+}
+
+void Bot::start_move(){
+    health_bar->show();
+    move_once();
+    move_clk->start();
+}
+
+void Bot::move_once(){
+    //游戏结束所有操作中断
+    if(unfinished){
+        movie->start();
+        gif->show();
+        step++;
+        if(step >= this_path->way.size()){
+            can_move = false;
+    //        defeat();
+            return end();
+        }
+        else{
+            block_now = map->all_block[this_path->way[step].y * map->get_colomn() + this_path->way[step].x];
+            animation->stop();
+            animation2->stop();
+            //设置起始位置
+            animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+            animation2->setStartValue(QRect(x_now - 215, y_now, gif->width(), gif->height()));
+            //设置终止位置
+            if(!block_now->empty()){
+                move_clk->stop();
+                //设置时间间隔
+                animation->setDuration(1000);
+                animation2->setDuration(4500);
+                x_now = this_path->way[step].x*70 + 35;
+                y_now = this_path->way[step].y*70;
+                animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation->setEasingCurve(QEasingCurve::Linear);
+                animation->start();
+                animation2->setEndValue(QRect(x_now - 215, y_now, gif->width(), gif->height()));
+                animation2->setEasingCurve(QEasingCurve::Linear);
+                animation2->start();
+                can_move = false;
+                QTimer::singleShot(3000, this, [=](){
+                    attack_clk->start();
+                });
+            }
+            else{
+                //设置时间间隔
+                animation->setDuration(1000);
+                animation2->setDuration(5000);
+                x_now = this_path->way[step].x*70;
+                y_now = this_path->way[step].y*70;
+                //设置结束位置
+                animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+                animation->setEasingCurve(QEasingCurve::Linear);
+                animation->start();
+                animation2->setEndValue(QRect(x_now - 215, y_now, gif->width(), gif->height()));
+                animation2->setEasingCurve(QEasingCurve::Linear);
+                animation2->start();
+                if(find_target()){
+                    move_clk->stop();
+                    QTimer::singleShot(5000, this, [=](){
+                        QMovie* former = movie;
+                        movie = new QMovie(":/res/BotCharge.gif");
+                        former->deleteLater();
+                        gif->setMovie(movie);
+                        movie->start();
+                        gif->show();
+                    });
+                    QTimer::singleShot(300, this, [=](){
+                        attack_clk->start();
+                    });
+                }
+            }
+        }
+    }
+}
+
+Defender* Bot::find_target(){
+    //搜索是否有可以攻击目标
+    if(!this->block_now->empty()) return (*(block_now->defender_in()))[0];
+    for(int i = this_path->way[step].x - 1; i >= 0 && i >= this_path->way[step].x - 3; i--){
+        for(int j = this_path->way[step].y - 1; j <= this_path->way[step].y + 1; j++){
+            if(j < 0) continue;
+            if(j == map->get_colomn()) break;
+            if(!map->all_block[j * map->get_colomn() + i]->empty()){
+                move_clk->stop();
+                QTimer::singleShot(3000, this, [=](){
+                    attack_clk->start();
+                });
+                return (*(map->all_block[j * map->get_colomn() + i]->defender_in()))[0];
+            }
+        }
+    }
+    return nullptr;
+}
+
+void Bot::attack(){
+    //游戏结束所有操作中断
+    if(unfinished){
+        Defender* target = find_target();
+        if(!target){
+            QMovie* former = movie;
+            movie = new QMovie(":/res/BotWalk.gif");
+            former->deleteLater();
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            can_move = true;
+            attack_clk->stop();
+            move_clk->start();
+            return move_once();
+        }
+        else{
+            animation3->setStartValue(QRect(x_now, y_now+10, bullet->width(), bullet->height()));
+            animation3->setEndValue(QRect(target->x()+35, target->y()+35, bullet->width(), bullet->height()));
+            animation->setEasingCurve(QEasingCurve::Linear);
+            animation3->setDuration(100);
+            bullet->show();
+            animation3->start();
+            QTimer::singleShot(100, bullet, [=](){
+                bullet->hide();
+            });
+            target->health_decrease(150, 100);
+            QMovie* former = movie;
+            movie = new QMovie(":/res/BotAttack.gif");
+            former->deleteLater();
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            QTimer::singleShot(350, this, [=](){
+                QMovie* former = movie;
+                movie = new QMovie(":/res/BotCharge.gif");
+                former->deleteLater();
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+            });
+        }
+    }
+}
+
+void Bot::die(){
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    animation3->deleteLater();
+    this->health_bar->deleteLater();
+    delete_enemy();
+    QMovie* former = movie;
+    movie = new QMovie(":/res/BotDead.gif");
+    former->deleteLater();
+    movie->start();
+    gif->setMovie(movie);
+    gif->show();
+    cut_off(gif,movie, 500);
+    bullet->deleteLater();
+    this->deleteLater();
+}
+
+void Bot::delete_now(){
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    movie->deleteLater();
+    gif->deleteLater();
 }
 
 

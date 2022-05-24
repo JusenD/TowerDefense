@@ -71,7 +71,10 @@ QLabel* Defender::get_gif() {
 void Defender::health_decrease(int n, int time) {
     QTimer::singleShot(time, this, [=]() {
         if (health > n) health -= n;
-        else die();
+        else if(!has_dead){
+            has_dead = true;
+            die();
+        }
         });
 }
 

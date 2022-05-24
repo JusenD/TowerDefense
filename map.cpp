@@ -325,6 +325,8 @@ void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
             break;
         case Enemy::BlackWitch:
             a_enemy = new BlackWitch(parent, which_path, this, step);
+        case Enemy::Bot:
+            a_enemy = new Bot(parent, which_path, this, step);
         }
     //    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
         if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
