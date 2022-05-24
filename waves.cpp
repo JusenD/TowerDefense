@@ -8,7 +8,6 @@ Waves::Waves(Map* the_map)
     srand(randtime.msec()+randtime.second()*1000); //初始化随机数
     clk = new QTimer();
     clk_internal = new QTimer();
-    clk_next_wave = new QTimer();
     QObject::connect(clk_internal, &QTimer::timeout, [=](){
         if(now < add_once){
             int random_enemy = rand() % max_level_enemy;
@@ -52,19 +51,26 @@ void Waves::stategy(){
             });
         });
     });
+    QTimer::singleShot(200000, this->clk, [=](){
+        the_map->victory();
+        this->stop();
+    });
 }
 
 void Waves::stop(){
-    clk->disconnect();
-    clk_internal->disconnect();
-    clk->stop();
-    clk_internal->stop();
-    if(NO_END) {
-        NO_END->disconnect();
-        NO_END->stop();
-        NO_END->deleteLater();
+    if(!has_stoped){
+        has_stoped = true;
+        clk->disconnect();
+        clk_internal->disconnect();
+        clk->stop();
+        clk_internal->stop();
+        if(NO_END) {
+            NO_END->disconnect();
+            NO_END->stop();
+            NO_END->deleteLater();
+        }
+        clk->deleteLater();
+        clk_internal->deleteLater();
     }
-    clk->deleteLater();
-    clk_internal->deleteLater();
 }
 

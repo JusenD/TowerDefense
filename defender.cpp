@@ -337,7 +337,7 @@ void Witch::attack() {
                         bang->move(place->x() + 35, place->y() - 10);
                         });
                 }
-                });
+            });
             QTimer::singleShot(700, this, [=]() {
                 QMovie* former = movie;
                 movie = new QMovie(":/res/wait.gif");

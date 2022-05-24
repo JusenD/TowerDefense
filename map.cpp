@@ -311,7 +311,7 @@ int Map::get_row(){return row;}
 
 //添加敌方单位
 void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
-    if(have_not_defeat && (step < (*this->path)[which_path].way.size())){
+    if(have_not_end && (step < (*this->path)[which_path].way.size())){
         Enemy* a_enemy = nullptr;
         switch (who) {
         case Enemy::Daida:
@@ -338,7 +338,7 @@ void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
 
 //添加我方单位
 void Map::add_defender(Block *where, Defender *single_defender){
-    if(have_not_defeat){
+    if(have_not_end){
         if(source >= single_defender->get_cost()){
             if(where->all_defender.empty()) {
                 source-=single_defender->get_cost();
@@ -353,7 +353,7 @@ void Map::add_defender(Block *where, Defender *single_defender){
 //资源随时间增加，使用递归调用
 void Map::increase_source(){
     QTimer::singleShot(ADD_TIME, [=](){
-        if(have_not_defeat){
+        if(have_not_end){
             source += ADD_ONCE;
             increase_source();
         }
@@ -379,13 +379,23 @@ void Map::decrease_health(int num){
 }
 
 void Map::defeat(){
-    have_not_defeat = false;
+    have_not_end = false;
     QMessageBox::information(parent, "info", "Defeat");
-    for(int i = 0; i < this->all_enemy.size();i++) all_enemy[i]->stop();
-    for(int j = 0; j < this->all_defender.size(); j++) all_defender[j]->stop();
+    for(auto enemy : all_enemy) enemy->stop();
+    for(auto defender : all_defender) defender->stop();
 }
 
-
+void Map::victory(){
+    have_not_end = false;
+    for(auto enemy : all_enemy) enemy->stop();
+    QMessageBox::information(parent, "info", "You have won!");
+    for(auto enemy : all_enemy){
+        QTimer::singleShot(50, this->parent, [=](){
+            enemy->die();
+        });
+    }
+    for(auto defender : all_defender) defender->stop();
+}
 
 
 

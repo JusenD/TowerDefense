@@ -41,8 +41,7 @@ class Map
     int row = 0;
     int colomn = 0;
     int health = 0;
-    void defeat();
-    bool have_not_defeat = true;
+    bool have_not_end = true;
 public:
     static vector<amap> all;
     static bool initialized;
@@ -59,6 +58,8 @@ public:
     void add_enemy(QWidget *parent, int which_path, int who, int step = 0);
     void add_defender(Block* where, Defender* single_defender);
     int *array;
+    void defeat();
+    void victory();
     //资源系统
     int get_source();
     void add_source(int num);

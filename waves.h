@@ -12,8 +12,8 @@ class Waves
     Map* the_map = nullptr;
     QTimer* clk = nullptr;
     QTimer* clk_internal = nullptr;
-    QTimer* clk_next_wave = nullptr;
     QTimer* NO_END = nullptr;
+    bool has_stoped = false;
 public:
     Waves(Map* the_map);
     void start(int add_once, int time_interval, int max_level_enemy);
