@@ -285,8 +285,8 @@ void Witch::add(Block* place) {
     animation = new QPropertyAnimation(bang, "geometry");
     //初始化时钟
     attack_clk = new QTimer(this);
-    //每隔3s攻击一次
-    attack_clk->setInterval(3000);
+    //每隔6s攻击一次
+    attack_clk->setInterval(6000);
     connect(attack_clk, &QTimer::timeout, this, &Witch::attack);
     this->attack();
     attack_clk->start();
@@ -611,8 +611,8 @@ void Droid::add(Block* place) {
     health_bar->move(23, 8);
     //初始化时钟
     attack_clk = new QTimer(this);
-    //每隔10s攻击一次
-    attack_clk->setInterval(10000);
+    //每隔15s攻击一次
+    attack_clk->setInterval(15000);
     connect(attack_clk, &QTimer::timeout, this, &Droid::attack);
     attack_clk->start();
 }
@@ -866,7 +866,7 @@ void King::attack() {
 void King::die() {
     attack_clk->stop();
     QMovie* former = movie;
-    movie = new QMovie(":/res/KingDead.gif");
+    movie = new QMovie(":/res/KingDeath.gif");
     former->deleteLater();
     gif->setMovie(movie);
     movie->start();

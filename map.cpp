@@ -325,8 +325,10 @@ void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
             break;
         case Enemy::BlackWitch:
             a_enemy = new BlackWitch(parent, which_path, this, step);
+            break;
         case Enemy::Bot:
             a_enemy = new Bot(parent, which_path, this, step);
+            break;
         }
     //    Enemy* a_enemy = new Enemy(parent, &(*this->path)[which_path], this);
         if(!a_enemy->is_ground() || (*this->path)[which_path].ground){
@@ -382,21 +384,21 @@ void Map::decrease_health(int num){
 
 void Map::defeat(){
     have_not_end = false;
-    QMessageBox::information(parent, "info", "Defeat");
     for(auto enemy : all_enemy) enemy->stop();
     for(auto defender : all_defender) defender->stop();
+    QMessageBox::information(parent, "info", "Defeat");
 }
 
 void Map::victory(){
     have_not_end = false;
     for(auto enemy : all_enemy) enemy->stop();
+    for(auto defender : all_defender) defender->stop();
     QMessageBox::information(parent, "info", "You have won!");
     for(auto enemy : all_enemy){
         QTimer::singleShot(50, this->parent, [=](){
             enemy->die();
         });
     }
-    for(auto defender : all_defender) defender->stop();
 }
 
 

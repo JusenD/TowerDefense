@@ -29,7 +29,7 @@ public:
     virtual void attack() = 0;
     virtual void delete_now() = 0;
     void stop();
-    void health_decrease(int n, int time);
+    virtual void health_decrease(int n, int time);
     virtual void die() = 0;
     bool is_ground();
     bool is_fly();
@@ -134,11 +134,15 @@ public:
 class Bot : public Ground_Enemy{
     QLabel* bullet = nullptr;
     QPropertyAnimation* animation3 = nullptr;
+    bool on_attack = false;
+    bool invincible = false;
+    float miss = 0.3;
 public:
     explicit Bot(QWidget *parent, int which_path, Map* map, int step = 0);
     void start_move();
     void move_once();
     void attack();
+    void health_decrease(int, int);
     void die();
     void stop();
     void delete_now();

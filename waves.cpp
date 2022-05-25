@@ -34,24 +34,36 @@ void Waves::stategy(){
     QTimer::singleShot(25000, this->clk, [=](){
         start(2, 10000, 1);
         QTimer::singleShot(25000, this->clk, [=](){
-            start(3, 10000, 5);
+            start(3, 10000, 2);
             QTimer::singleShot(25000, this->clk, [=](){
-                start(3, 10000, 5);
+                start(3, 10000, 3);
             });
             QTimer::singleShot(30000, this->clk, [=](){
 
-                start(4, 10000, 5);
+                start(4, 10000, 4);
                 NO_END = new QTimer();
                 add_once = 5;
                 QObject::connect(NO_END, &QTimer::timeout, [=](){
-                    start(add_once, 10000, 5);
+                    start(add_once, 10000, 4);
                     add_once++;
                 });
                 NO_END->start(25000);
             });
         });
     });
-    QTimer::singleShot(200000, this->clk, [=](){
+    QTimer::singleShot(100000, this->clk, [=](){
+        the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+    });
+    QTimer::singleShot(165000, this->clk, [=](){
+        the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+        QTimer::singleShot(1000, this->clk, [=](){
+            the_map->add_enemy(the_map->parent, 1, Enemy::Bot);
+            QTimer::singleShot(1000, this->clk, [=](){
+                the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+            });
+        });
+    });
+    QTimer::singleShot(220000, this->clk, [=](){
         the_map->victory();
         this->stop();
     });

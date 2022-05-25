@@ -6,6 +6,8 @@
 #include<QMovie>
 #include<mainwindow.h>
 #include"healthbar.h"
+#include<QTime>
+#include<QDebug>
 
 bool Enemy::on_delete = false;
 bool Enemy::all_enemy_access = true;
@@ -838,6 +840,7 @@ void Bot::move_once(){
         movie->start();
         gif->show();
         step++;
+        on_attack = false;
         if(step >= this_path->way.size()){
             can_move = false;
     //        defeat();
@@ -852,7 +855,6 @@ void Bot::move_once(){
             animation2->setStartValue(QRect(x_now - 215, y_now, gif->width(), gif->height()));
             //设置终止位置
             if(!block_now->empty()){
-                move_clk->stop();
                 //设置时间间隔
                 animation->setDuration(1000);
                 animation2->setDuration(4500);
@@ -866,6 +868,7 @@ void Bot::move_once(){
                 animation2->start();
                 can_move = false;
                 QTimer::singleShot(3000, this, [=](){
+                    move_clk->stop();
                     attack_clk->start();
                 });
             }
@@ -882,20 +885,21 @@ void Bot::move_once(){
                 animation2->setEndValue(QRect(x_now - 215, y_now, gif->width(), gif->height()));
                 animation2->setEasingCurve(QEasingCurve::Linear);
                 animation2->start();
-                if(find_target()){
-                    move_clk->stop();
-                    QTimer::singleShot(5000, this, [=](){
-                        QMovie* former = movie;
-                        movie = new QMovie(":/res/BotCharge.gif");
-                        former->deleteLater();
-                        gif->setMovie(movie);
-                        movie->start();
-                        gif->show();
-                    });
-                    QTimer::singleShot(300, this, [=](){
+                QTimer::singleShot(4000, this, [=](){
+                    if(find_target()){
+                        move_clk->stop();
                         attack_clk->start();
-                    });
-                }
+                        QTimer::singleShot(1000, this, [=](){
+                            QMovie* former = movie;
+                            movie = new QMovie(":/res/BotCharge.gif");
+                            former->deleteLater();
+                            gif->setMovie(movie);
+                            movie->start();
+                            gif->show();
+                            on_attack = true;
+                        });
+                    }
+                });
             }
         }
     }
@@ -909,10 +913,6 @@ Defender* Bot::find_target(){
             if(j < 0) continue;
             if(j == map->get_colomn()) break;
             if(!map->all_block[j * map->get_colomn() + i]->empty()){
-                move_clk->stop();
-                QTimer::singleShot(3000, this, [=](){
-                    attack_clk->start();
-                });
                 return (*(map->all_block[j * map->get_colomn() + i]->defender_in()))[0];
             }
         }
@@ -962,6 +962,70 @@ void Bot::attack(){
                 gif->show();
             });
         }
+    }
+}
+
+void Bot::health_decrease(int n, int time){
+    if(!invincible){
+        QTimer::singleShot(time - 100, this, [=](){
+            QTime time = QTime::currentTime();
+            srand(time.second()*1000 + time.msec());
+            int lucky_dog = rand()%10;
+            if(lucky_dog < 10 * miss){
+                invincible = true;
+                bool attack_pause = false, move_pause = false;
+                int move_remain = move_clk->remainingTime();
+                int attack_remain = attack_clk->remainingTime();
+                qDebug()<<"attack_pause:"<<attack_pause<<"move_pause:"<< move_pause <<"attack_remain:"<<attack_remain<<"move_remain:"<<move_remain;
+                if(move_remain != -1 && move_remain < 500) {move_clk->stop(); move_pause = true;}
+                if(attack_remain!= -1 && attack_remain < 500) {attack_clk->stop(); attack_pause = true;}
+                if(attack_remain != -1) on_attack = true;
+                QMovie* former = movie;
+                movie = new QMovie(":/res/BotDashL.gif");
+                former->deleteLater();
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+                QTimer::singleShot(250, this, [=](){
+                    QMovie* former = movie;
+                    movie = new QMovie(":/res/BotDashR.gif");
+                    former->deleteLater();
+                    gif->setMovie(movie);
+                    movie->start();
+                    gif->show();
+                });
+                QTimer::singleShot(500, this, [=](){
+                    invincible = false;
+                    QMovie* former = movie;
+                    if(on_attack) movie = new QMovie(":/res/BotCharge.gif");
+                    else movie = new QMovie(":/res/BotWalk.gif");
+                    former->deleteLater();
+                    gif->setMovie(movie);
+                    movie->start();
+                    gif->show();
+                    if(attack_pause) {
+                            attack_clk->start(500);
+                            QTimer::singleShot(510, this, [=](){
+                                attack_clk->setInterval(4000);
+                                attack_clk->start();
+                            });
+                    }
+                    if(move_pause) {
+                            move_clk->start(500);
+                            QTimer::singleShot(510, this, [=](){
+                                move_clk->setInterval(5000);
+                                if(!on_attack) move_clk->start();
+                            });
+                    }
+                });
+            }
+            else{
+                QTimer::singleShot(90, this, [=](){
+                    if(health>n) health-=n;
+                    else if(!has_dead){die(); has_dead = true;}
+                });
+            }
+        });
     }
 }
 
