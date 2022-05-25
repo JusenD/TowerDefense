@@ -19,7 +19,10 @@ SOURCES += \
     selection.cpp \
     healthbar.cpp \
     waves.cpp \
-    start_menue.cpp
+    start_menue.cpp \
+    addwindow.cpp \
+    pathblock.cpp \
+    editwindow.cpp
 
 HEADERS += \
     block.h \
@@ -31,10 +34,15 @@ HEADERS += \
     selection.h \
     healthbar.h \
     waves.h \
-    start_menue.h
+    start_menue.h \
+    addwindow.h \
+    pathblock.h \
+    editwindow.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    addwindow.ui \
+    editwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

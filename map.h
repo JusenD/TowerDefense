@@ -47,6 +47,7 @@ public:
     static bool initialized;
     static int map_cnt;
     static void init();
+    static void reinit();
     Map(QWidget* parent, int num);
     int get_colomn();
     int get_row();

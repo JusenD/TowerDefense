@@ -16,6 +16,8 @@ bool Map::initialized = false;
 void  Map::init(){            //所有地图初始化
     if(!initialized){
         initialized = true;
+        all.clear();
+        map_cnt = 0;
         ifstream all_maps("./Map.txt", ios::in);
         char buffer[1000];
         int ways_cnt = 0;
@@ -82,113 +84,13 @@ void  Map::init(){            //所有地图初始化
             all.push_back(*single_map);
         }
     }
-//    int row = 0, colomn = 0;
-//    //一张15x10地图
-//    amap first_map;
-//    //初始生命值
-//    first_map.health = 5000;
-//    //设置初始资源和增长速度
-//    first_map.original_source = 10000;
-//    first_map.source_speed = 6000;
-//    first_map.add_once = 50;
-//    row = 10; colomn = 15;
-//    first_map.row = row;
-//    first_map.colomn = colomn;
-//    first_map.array = new int[row*colomn];
-//    memset(first_map.array, 0, colomn*row * 4);
-//    vector<coordinate> way;
-//    //设置了一条路径，是否可以用一个比较通用的方法 对啊用 new + for(某个函数可以这样搞)
-//    coordinate r1(14, 0);coordinate r2(13, 0);coordinate r3(12, 0);
-//    coordinate r4(12, 1);coordinate r5(11, 1);coordinate r6(10, 1);
-//    coordinate r7(9, 1);coordinate r8(8, 1);coordinate r9(8, 2);
-//    coordinate r10(7, 2);coordinate r11(6, 2);coordinate r12(5, 2);
-//    coordinate r16(5, 3);coordinate r17(4, 3);coordinate r18(3, 3);
-//    coordinate r19(3, 4);coordinate r20(2, 4);coordinate r21(1, 4);
-//    coordinate r22(0, 4);
-//    way.push_back(r1);way.push_back(r2);way.push_back(r3);
-//    way.push_back(r4);way.push_back(r5);way.push_back(r6);
-//    way.push_back(r7);way.push_back(r8);way.push_back(r9);
-//    way.push_back(r10);way.push_back(r11);way.push_back(r12);
-//    way.push_back(r16);way.push_back(r17);way.push_back(r18);
-//    way.push_back(r19);way.push_back(r20);way.push_back(r21);
-//    way.push_back(r22);
-//    Single_Path* path = new Single_Path(way);
-//    //设置路径1为地面路径
-//    path->ground = true;
-//    //将路径所在处设为1
-//    if(path->ground){
-//        for(int i = 0; i < way.size(); i++){
-//            first_map.array[way[i].y * colomn + way[i].x] = 1;  //等于1表示地面路径
-//        }
-//    }
-//    //设置第二条路经
-//    vector<coordinate> way2;
-//    for(int i = 0; i < row; i++){
-//        coordinate *buffer1 = new coordinate(14-i, i);
-//        coordinate *buffer2 = new coordinate(13-i, i);
-//        way2.push_back(*buffer1);
-//        way2.push_back(*buffer2);
-//    }
-//    Single_Path* path2 = new Single_Path(way2);
-//    path2->ground = true;
-//    if(path->ground){
-//        for(int i = 0; i < way2.size(); i++){
-//            first_map.array[way2[i].y * colomn + way2[i].x] = 1;
-//        }
-//    }
-//    //设置第三条路经
-//    vector<coordinate> way3;
-//    for(int i = row-1; i >= 0; i--){
-//        coordinate *buffer1 = new coordinate(i+3, i);
-//        coordinate *buffer2 = new coordinate(i+2, i);
-//        way3.push_back(*buffer1);
-//        way3.push_back(*buffer2);
-//    }
-//    Single_Path* path3 = new Single_Path(way3);
-//    path3->ground = false;
-//    if(path3->ground){
-//        for(int i = 0; i < way3.size(); i++){
-//            if(!first_map.array[way3[i].y * colomn + way3[i].x])
-//            first_map.array[way3[i].y * colomn + way3[i].x] = 2;    //等于2表示飞行路径
-//        }
-//    }
-
-//    first_map.path.push_back(*path);
-//    first_map.path.push_back(*path2);
-//    first_map.path.push_back(*path3);
-//    all.push_back(first_map);
-
-//    //一张10x10地图
-//    row = 10; colomn = 10;
-//    amap second_map;
-//    //初始生命值
-//    second_map.health = 300;
-//    //设置初始资源和增长速度
-//    second_map.original_source = 0;
-//    second_map.source_speed = 3000;
-//    second_map.add_once = 50;
-//    second_map.row = row;
-//    second_map.colomn = colomn;
-//    second_map.array = new int[row*colomn];
-//    memset(second_map.array, 0, row*colomn*4);
-//    //设置第一条路经
-//    way.clear();
-//    for(int i = 0; i < row - 1; i++){
-//        coordinate *buffer1 = new coordinate(9-i, i);
-//        coordinate *buffer2 = new coordinate(8-i, i);
-//        way.push_back(*buffer1);
-//        way.push_back(*buffer2);
-//    }
-//    coordinate *buffer1 = new coordinate(0, 9);
-//    way.push_back(*buffer1);
-//    for(int i = 0; i < way.size(); i++){
-//        second_map.array[way[i].y * colomn + way[i].x] = 1;
-//    }
-//    path = new Single_Path(way);
-//    second_map.path.push_back(*path);
-//    all.push_back(second_map);
-
 }
+
+void Map::reinit(){
+    initialized = false;
+    init();
+}
+
 Map::Map(QWidget* parent, int num){
     //加载初始地图参数
     this->parent = parent;
@@ -311,7 +213,7 @@ int Map::get_row(){return row;}
 
 //添加敌方单位
 void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
-    if(have_not_end && (step < (*this->path)[which_path].way.size())){
+    if(have_not_end && which_path < (*this->path).size() && (step < (*this->path)[which_path].way.size())){
         Enemy* a_enemy = nullptr;
         switch (who) {
         case Enemy::Daida:
