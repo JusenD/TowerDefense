@@ -83,12 +83,16 @@ void Defender::die() {
     this->place->delete_defender(this);
     delete_defender();
     this->health_bar->deleteLater();
+    if(detail_out){
+        detail->disappear();
+    }
     this->deleteLater();
 }
 
 void Defender::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->gif->deleteLater();
     this->movie->deleteLater();
     this->deleteLater();
@@ -116,6 +120,19 @@ void Defender::mouseReleaseEvent(QMouseEvent* event) {
         this->die();
         emit((MainWindow*)parent)->get_selection()->mouseReleaseEvent(event);
     }
+    else {
+        if(!detail_out){
+            detail = new Detail(parent, this->x(), this->y(), &this->health, &this->damage, this->original_health, this->original_damage);
+            detail->appear();
+            detail_out = true;
+            grabMouse();
+        }
+        else {
+            detail->disappear();
+            detail_out = false;
+            releaseMouse();
+        }
+    }
 }
 
 Boji::Boji(QWidget* parent)
@@ -127,6 +144,7 @@ Boji::Boji(QWidget* parent)
     this->health = 300;
     this->original_health = health;
     this->damage = 0;
+    this->original_damage = damage;
     this->cost = 100;
     this->fighter = true;
     //   this->move(place->x(), place->y());
@@ -166,6 +184,7 @@ void Boji::add(Block* place) {
 void Boji::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     gif->deleteLater();
     attack_clk->deleteLater();
@@ -235,6 +254,7 @@ Witch::Witch(QWidget* parent)
     this->health = 100;
     this->original_health = health;
     this->damage = 100;
+    this->original_damage = damage;
     this->cost = 200;
     this->range = 300;
     this->fighter = false;
@@ -248,8 +268,6 @@ void Witch::add(Block* place) {
     this->move(place->x(), place->y());
     //    qDebug()<<place->x()<<place->y();
     this->show();
-    //设置事件过滤器
-    this->installEventFilter(this);
     //显示等待动画gif
     gif = new QLabel(parent);
     gif->setFixedSize(70, 100);
@@ -281,7 +299,6 @@ void Witch::add(Block* place) {
     bang->setScaledContents(true);
     bang_movie = new QMovie(":/res/bang.gif");
     bang->setMovie(bang_movie);
-
     animation = new QPropertyAnimation(bang, "geometry");
     //初始化时钟
     attack_clk = new QTimer(this);
@@ -293,6 +310,7 @@ void Witch::add(Block* place) {
     //初始化animation
     animation1 = new QPropertyAnimation(range_circle, "geometry");
     animation2 = new QPropertyAnimation(range_circle, "geometry");
+    this->setFocusPolicy(Qt::NoFocus);
 }
 
 void Witch::attack() {
@@ -353,55 +371,64 @@ void Witch::attack() {
 }
 
 //用事件过滤器点击女巫后显示攻击范围
-bool Witch::eventFilter(QObject* obj, QEvent* event) {
-    if (obj == this) {
-        if (event->type() == QEvent::MouseButtonRelease && !((MainWindow*)parent)->can_remove()) {
-            if (!bounce_out) {
-                //创建circle_range label
-                QLabel* former = range_circle;
-                range_circle = new QLabel(parent);
-                former->deleteLater();
-                range_circle->resize(0, 0);
-                QPixmap pix;
-                pix.load(":/res/range_circle.png");
-                pix.scaled(range, range);
-                range_circle->setScaledContents(true);
-                range_circle->setPixmap(pix);
-                range_circle->setAttribute(Qt::WA_TransparentForMouseEvents);
-                animation1->stop();
-                animation2->stop();
-                /* 设置动画持续时长 */
-                animation1->setDuration(200);
-                animation1->setTargetObject(range_circle);
-                /* 设置动画开始坐标和大小(QRect) */
-                /* 居中显示数值计算：160 => (320/2 - 100); 120 => (240/2 - 100) */
-                animation1->setStartValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
-                /* 设置动画结束坐标和大小(QRect) */
-                /* 居中显示数值计算(差值是基于开始动画的100/2)：160 => (160 - 100/2); 70 => (120 - 100/2) */
-                animation1->setEndValue(QRect(this->x() + 35 - range, this->y() + 35 - range, 2 * range, 2 * range));
-                /* 开始动画 */
-                range_circle->show();
-                animation1->start();
-                bounce_out = true;
-            }
-            else {
-                animation1->stop();
-                /* 设置动画持续时长 */
-                animation2->setDuration(150);
-                animation2->setTargetObject(range_circle);
-                /* 设置动画开始坐标和大小(QRect) */
-                animation2->setStartValue(QRect(this->x() + 35 - range, this->y() + 35 - range, 2 * range, 2 * range));
-                //animation->setStartValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
-                /* 设置动画结束坐标和大小(QRect) */
-                animation2->setEndValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
-                /* 开始动画 */
-                animation2->start();
+void Witch::mouseReleaseEvent(QMouseEvent* event){
+    if (!((MainWindow*)parent)->can_remove()) {
+        if (!bounce_out) {
+            //创建circle_range label
+            QLabel* former = range_circle;
+            range_circle = new QLabel(parent);
+            former->deleteLater();
+            range_circle->resize(0, 0);
+            QPixmap pix;
+            pix.load(":/res/range_circle.png");
+            pix.scaled(range, range);
+            range_circle->setScaledContents(true);
+            range_circle->setPixmap(pix);
+            range_circle->setAttribute(Qt::WA_TransparentForMouseEvents);
+            animation1->stop();
+            animation2->stop();
+            /* 设置动画持续时长 */
+            animation1->setDuration(200);
+            animation1->setTargetObject(range_circle);
+            /* 设置动画开始坐标和大小(QRect) */
+            /* 居中显示数值计算：160 => (320/2 - 100); 120 => (240/2 - 100) */
+            animation1->setStartValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
+            /* 设置动画结束坐标和大小(QRect) */
+            /* 居中显示数值计算(差值是基于开始动画的100/2)：160 => (160 - 100/2); 70 => (120 - 100/2) */
+            animation1->setEndValue(QRect(this->x() + 35 - range, this->y() + 35 - range, 2 * range, 2 * range));
+            /* 开始动画 */
+            range_circle->show();
+            animation1->start();
+            bounce_out = true;
+            detail = new Detail(parent, this->x(), this->y(), &this->health, &this->damage, this->original_health, this->original_damage);
+            detail->appear();
+            detail_out = true;
+            grabMouse();
+        }
+        else {
+            animation1->stop();
+            /* 设置动画持续时长 */
+            animation2->setDuration(150);
+            animation2->setTargetObject(range_circle);
+            /* 设置动画开始坐标和大小(QRect) */
+            animation2->setStartValue(QRect(this->x() + 35 - range, this->y() + 35 - range, 2 * range, 2 * range));
+            //animation->setStartValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
+            /* 设置动画结束坐标和大小(QRect) */
+            animation2->setEndValue(QRect(this->x() + 35, this->y() + 35, 0, 0));
+            /* 开始动画 */
+            animation2->start();
 //                cut_off(range_circle, nullptr, 250);
-                bounce_out = false;
-            }
+            bounce_out = false;
+            detail->disappear();
+            detail_out = false;
+            releaseMouse();
         }
     }
-    return QWidget::eventFilter(obj, event);
+    else {
+        ((MainWindow*)parent)->change_remove(false);
+        this->die();
+        emit((MainWindow*)parent)->get_selection()->mouseReleaseEvent(event);
+    }
 }
 
 void Witch::die() {
@@ -412,6 +439,7 @@ void Witch::die() {
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     delete_defender();
     animation->deleteLater();
@@ -436,6 +464,7 @@ void Witch::die() {
 void Witch::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     animation->deleteLater();
     gif->deleteLater();
@@ -458,6 +487,7 @@ EvilWizard::EvilWizard(QWidget* parent)
     this->health = 200;
     this->original_health = health;
     this->damage = 100;
+    this->original_damage = damage;
     this->cost = 300;
     this->fighter = true;
 
@@ -556,6 +586,7 @@ void EvilWizard::die() {
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     delete_defender();
     cut_off(gif, movie, 800);
@@ -566,6 +597,7 @@ void EvilWizard::die() {
 void EvilWizard::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     gif->deleteLater();
     movie->deleteLater();
@@ -583,6 +615,7 @@ Droid::Droid(QWidget* parent)
     this->health = 100;
     this->original_health = health;
     this->damage = 0;
+    this->original_damage = damage;
     this->cost = 100;
     this->fighter = true;
     //   this->move(place->x(), place->y());
@@ -645,6 +678,7 @@ void Droid::die() {
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     delete_defender();
     cut_off(gif, movie, 700);
@@ -655,6 +689,7 @@ void Droid::die() {
 void Droid::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     gif->deleteLater();
     movie->deleteLater();
@@ -670,6 +705,7 @@ Soildier::Soildier(QWidget* parent)
     this->health = 300;
     this->original_health = health;
     this->damage = 30;
+    this->original_damage = damage;
     this->cost = 0;
     this->fighter = true;
 }
@@ -763,6 +799,7 @@ void Soildier::die() {
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     delete_defender();
     cut_off(gif, movie, 3700);
@@ -775,6 +812,7 @@ void Soildier::die() {
 void Soildier::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     gif->deleteLater();
     movie->deleteLater();
@@ -793,6 +831,7 @@ King::King(QWidget* parent)
     this->health = 400;
     this->original_health = health;
     this->damage = 0;
+    this->original_damage = damage;
     this->cost = 800;
     this->fighter = false;
     this->king = true;
@@ -871,6 +910,7 @@ void King::die() {
     gif->setMovie(movie);
     movie->start();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     delete_defender();
     cut_off(gif, movie, 2500);
@@ -881,6 +921,7 @@ void King::die() {
 void King::delete_now() {
     attack_clk->stop();
     this->health_bar->deleteLater();
+    if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
     gif->deleteLater();
     movie->deleteLater();

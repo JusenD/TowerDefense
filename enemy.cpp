@@ -35,7 +35,7 @@ void Enemy::delete_enemy(){
 void Enemy::health_decrease(int n, int time){
     QTimer::singleShot(time, this, [=](){
         if(health>n) health-=n;
-        else if(!has_dead){die(); has_dead = true;}
+        else if(!has_dead){health = 0 ; die(); has_dead = true;}
     });
 }
 
@@ -72,6 +72,20 @@ QLabel* Enemy::get_gif(){
     return this->gif;
 }
 
+void Enemy::mouseReleaseEvent(QMouseEvent* event) {
+    if(!detail_out){
+        detail = new Detail(parent, this->get_gif(), &this->health, &this->damage, this->original_health, this->original_damage);
+        detail->appear();
+        detail_out = true;
+        grabMouse();
+    }
+    else {
+        detail->disappear();
+        detail_out = false;
+        releaseMouse();
+    }
+}
+
 void Enemy::end(){
     this->map->decrease_health(this->health);
     this->die();
@@ -95,7 +109,7 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     //初始化gif(为血条作准备)
     gif = new QLabel;
     gif->setParent(parent);
-    gif->resize(60, 90);
+    gif->setFixedSize(60, 90);
     gif->setAttribute(Qt::WA_TransparentForMouseEvents);
     gif->show();
     gif->move(x_now, y_now - 20);
@@ -104,6 +118,8 @@ Daida::Daida(QWidget *parent, int which_path, Map* map, int step)
     this->original_health = health;
     this->health_bar = new healthBar(this);
     health_bar->move(6, 8);
+    this->damage = 50;
+    this->original_damage = damage;
     //初始化动画
     animation = new QPropertyAnimation(this, "geometry");
     animation1 = new QPropertyAnimation(this, "geometry");
@@ -214,7 +230,7 @@ void Daida::attack(){       //一次攻击，攻击频率为 hz
         }
         else{
             Defender* target = this->block_now->defender_in()->back();
-            target->health_decrease(50, 250);
+            target->health_decrease(damage, 250);
             //设置攻击动画
             //设置时间间隔
             animation1->setDuration(250);
@@ -260,6 +276,7 @@ void Daida::die(){
     //在所有敌人中删除该敌人
     delete_enemy();
     this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
     this->gif->deleteLater();
     this->deleteLater();
 }
@@ -273,6 +290,7 @@ void Daida::delete_now() {
     animation3->deleteLater();
     animation4->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
     this->gif->deleteLater();
     this->deleteLater();
 }
@@ -310,6 +328,8 @@ Skeleton::Skeleton(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(30, 8);
+    this->damage = 150;
+    this->original_damage = damage;
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -405,7 +425,7 @@ void Skeleton::attack(){
         }
         else{
             Defender* target = this->block_now->defender_in()->back();
-            target->health_decrease(150, 800);
+            target->health_decrease(damage, 800);
             QMovie* former = movie;
             movie = new QMovie(":/res/SkeletonAttack.gif");
             former->deleteLater();
@@ -413,7 +433,6 @@ void Skeleton::attack(){
             movie->start();
             gif->show();
             QTimer::singleShot(1700, this, [=](){
-                gif->resize(60, 90);
                 QMovie* former = movie;
                 movie = new QMovie(":/res/SkeletonIdle.gif");
                 former->deleteLater();
@@ -434,6 +453,7 @@ void Skeleton::die(){
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
     delete_enemy();
     QMovie* former = movie;
     movie = new QMovie(":/res/SkeletonDead.gif");
@@ -454,6 +474,7 @@ void Skeleton::delete_now() {
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
     movie->deleteLater();
     gif->deleteLater();
     this->deleteLater();
@@ -484,6 +505,8 @@ Bat::Bat(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(10, 7);
+    this->damage = 50;
+    this->original_damage = damage;
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -570,7 +593,7 @@ void Bat::attack(){
         }
         else{
             Defender* target = this->block_now->defender_in()->back();
-            target->health_decrease(50, 300);
+            target->health_decrease(damage, 300);
             QMovie* former = movie;
             movie = new QMovie(":/res/BatAttack.gif");
             former->deleteLater();
@@ -598,6 +621,7 @@ void Bat::die(){
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
     delete_enemy();
     QMovie* former = movie;
     movie = new QMovie(":/res/BatDeath.gif");
@@ -618,6 +642,7 @@ void Bat::delete_now() {
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
     movie->deleteLater();
     gif->deleteLater();
 }
@@ -749,6 +774,7 @@ void BlackWitch::die(){
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
     delete_enemy();
     QMovie* former = movie;
     movie = new QMovie(":/res/BlackWitchDead.gif");
@@ -773,6 +799,7 @@ void BlackWitch::delete_now() {
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
     movie->deleteLater();
     gif->deleteLater();
     this->deleteLater();
@@ -814,6 +841,8 @@ Bot::Bot(QWidget *parent, int which_path, Map* map, int step){
     //初始化血条
     this->health_bar = new healthBar(this);
     health_bar->move(115, 0);
+    this->damage = 150;
+    this->original_damage = damage;
     //初始化animation
     animation = new QPropertyAnimation(this, "geometry");
     animation2 = new QPropertyAnimation(gif, "geometry");
@@ -946,7 +975,7 @@ void Bot::attack(){
             QTimer::singleShot(100, bullet, [=](){
                 bullet->hide();
             });
-            target->health_decrease(150, 100);
+            target->health_decrease(damage, 100);
             QMovie* former = movie;
             movie = new QMovie(":/res/BotAttack.gif");
             former->deleteLater();
@@ -1039,6 +1068,7 @@ void Bot::die(){
     animation2->deleteLater();
     animation3->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
     delete_enemy();
     QMovie* former = movie;
     movie = new QMovie(":/res/BotDead.gif");
@@ -1060,6 +1090,7 @@ void Bot::delete_now(){
     animation->deleteLater();
     animation2->deleteLater();
     this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
     movie->deleteLater();
     gif->deleteLater();
 }

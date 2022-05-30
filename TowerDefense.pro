@@ -22,7 +22,8 @@ SOURCES += \
     start_menue.cpp \
     addwindow.cpp \
     pathblock.cpp \
-    editwindow.cpp
+    editwindow.cpp \
+    detail.cpp
 
 HEADERS += \
     block.h \
@@ -37,7 +38,8 @@ HEADERS += \
     start_menue.h \
     addwindow.h \
     pathblock.h \
-    editwindow.h
+    editwindow.h \
+    detail.h
 
 FORMS += \
     mainwindow.ui \

@@ -155,7 +155,7 @@ void Selection::unsufficient(int num){
                 QPixmap pix;
                 pix.load(buffer);
                 //设置不规则图片样式
-                this->setStyleSheet("QPushButton{border:0px;}");
+                //this->setStyleSheet("QPushButton{border:0px;}");
                 setIcon(pix);
                 setIconSize(QSize(90, 90));
             }else if(!has_selected){
@@ -164,7 +164,7 @@ void Selection::unsufficient(int num){
                 QPixmap pix;
                 pix.load(buffer);
                 //设置不规则图片样式
-                this->setStyleSheet("QPushButton{border:0px;}");
+//                this->setStyleSheet("QPushButton{border:0px;}");
                 setIcon(pix);
                 setIconSize(QSize(90, 90));
                 can_select = true;

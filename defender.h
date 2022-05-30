@@ -2,8 +2,9 @@
 #define DEFENDER_H
 
 #include <QWidget>
-#include<QLabel>
-#include<QPropertyAnimation>
+#include <QLabel>
+#include <QPropertyAnimation>
+#include "detail.h"
 
 class Block;
 class healthBar;
@@ -26,7 +27,7 @@ public:
     bool is_tower();
     bool is_king();
     void remove_defender();
-    void mouseReleaseEvent(QMouseEvent* event);
+    virtual void mouseReleaseEvent(QMouseEvent* event);
     void stop();
     static bool on_delete;
     static bool all_enemy_access;
@@ -34,6 +35,7 @@ public:
     static void cut_off(QLabel* gif, QMovie* movie, int time);
 protected:
     int original_health = 0;
+    int original_damage = 0;
     int health = 0;
     int damage = 0;
     int cost = 0;
@@ -49,6 +51,9 @@ protected:
     QMovie* movie = nullptr;
     //时钟信号
     QTimer* attack_clk = nullptr;
+    //信息显示
+    Detail* detail = nullptr;
+    bool detail_out = false;
 signals:
 
 };
@@ -79,7 +84,7 @@ public:
     void attack();
     void die();
     void delete_now();
-    bool eventFilter(QObject* obj, QEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
 };
 
 class EvilWizard : public Defender {

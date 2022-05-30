@@ -2,10 +2,11 @@
 #define ENEMY_H
 
 #include <QWidget>
-#include"path.h"
-#include"block.h"
-#include<QPropertyAnimation>
-#include<QTimer>
+#include "path.h"
+#include "block.h"
+#include <QPropertyAnimation>
+#include <QTimer>
+#include "detail.h"
 
 class MainWindow;
 class Map;
@@ -43,9 +44,11 @@ public:
     QLabel* get_gif();
     static void cut_off(QLabel* gif,QMovie* movie, int time);
     static bool on_delete;
+    virtual void mouseReleaseEvent(QMouseEvent* event);
 protected:
     //设置生命值
     int original_health = 0;
+    int original_damage = 0;
     int health = 0;
     int damage = 0;
     bool can_move = true;
@@ -56,6 +59,7 @@ protected:
     Single_Path* this_path = nullptr;
     bool unfinished = true;
     healthBar* health_bar;
+    Detail* detail = nullptr;
     QLabel* gif = nullptr;
     QMovie* movie = nullptr;
     //时钟信号
@@ -63,6 +67,7 @@ protected:
     QTimer* attack_clk = nullptr;
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
+    bool detail_out = false;
 };
 
 class Ground_Enemy:public Enemy{

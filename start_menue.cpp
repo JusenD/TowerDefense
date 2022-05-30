@@ -50,9 +50,9 @@ Start_menue::Start_menue(QWidget *parent) : QMainWindow(parent)
             this->show();
         });
     });
-    //编辑地图按钮
+    //DIY地图按钮
     QPushButton *edit_map_btn = new QPushButton(this);
-    edit_map_btn->setText("编辑地图");
+    edit_map_btn->setText("DIY地图");
     edit_map_btn->move(400, 650);
     connect(edit_map_btn, &QPushButton::released, this, [=](){
         EditWindow* editwindow = new EditWindow(nullptr, &(Map::all));

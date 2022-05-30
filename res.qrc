@@ -106,5 +106,6 @@
         <file>res/BotDead.gif</file>
         <file>res/BotWalk.gif</file>
         <file>res/bullet.png</file>
+        <file>res/detail.png</file>
     </qresource>
 </RCC>

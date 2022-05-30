@@ -8,6 +8,7 @@
 #include"selection.h"
 #include<QMovie>
 #include<QDebug>
+#include"detail.h"
 
 MainWindow::MainWindow(int which_map, QWidget *parent)
     : QMainWindow(parent)
@@ -120,6 +121,10 @@ MainWindow::MainWindow(int which_map, QWidget *parent)
     spade_selection->move(960-1, 70*the_map->get_row() + 9);
     spade_selection->show();
 
+//    int x = 5, y = 10;
+//    Detail* try_detail = new Detail(this, &x, &y);
+//   try_detail->move(100, 100);
+//   try_detail->show();
 }
 
 void MainWindow::paintEvent(QPaintEvent*){

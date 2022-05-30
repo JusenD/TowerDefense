@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>EditWindow</class>
  <widget class="QWidget" name="EditWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>571</width>
+    <height>571</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -133,6 +141,9 @@
        <width>81</width>
        <height>31</height>
       </rect>
+     </property>
+     <property name="minimum">
+      <number>1</number>
      </property>
      <property name="maximum">
       <number>999999</number>

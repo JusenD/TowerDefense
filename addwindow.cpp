@@ -33,6 +33,13 @@ AddWindow::AddWindow(QWidget *parent) :
                 a_block->show();
             }
         }
+        if(colomn >= 20){
+            this->setFixedWidth(120 + 20 * colomn);
+        }
+        this->setFixedHeight(200 + 20 * row);
+        ui->reset_button->move(this->width()/2 - 50 - 70, this->height() - 70);
+        ui->confirm_path->move(this->width()/2 + 50, this->height() - 70);
+        ui->stackedWidget->setFixedSize(this->width(), this->height());
         ui->stackedWidget->setCurrentIndex(1);
     });
     connect(ui->reset_button, &QPushButton::released, this, [=](){
