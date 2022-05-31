@@ -10,6 +10,7 @@ healthBar::healthBar(Enemy* parent) : QLabel(parent->get_gif())
     this->type = 0;
     this->enemy_parent = parent;
     this->total = parent->get_original_health();
+    startTimer(100);
 }
 
 healthBar::healthBar(Defender* parent) : QLabel(parent->get_gif())
@@ -20,13 +21,18 @@ healthBar::healthBar(Defender* parent) : QLabel(parent->get_gif())
     this->type = 1;
     this->defender_parent = parent;
     this->total = parent->get_original_health();
+    startTimer(100);
+}
+
+void healthBar::timerEvent(QTimerEvent* event){
+    this->update();
 }
 
 void healthBar::paintEvent(QPaintEvent* event){
     QPainter painter(this);
     float rate;
     if(type == 0){
- //       qDebug()<< enemy_parent->get_gif()->x()<<enemy_parent->get_gif()->y();
+ //     qDebug()<< enemy_parent->get_gif()->x()<<enemy_parent->get_gif()->y();
         QBrush red_brush(QColor("#CD2626"));
         painter.setBrush(red_brush);
         rate = 1.0 * enemy_parent->get_health()/total;

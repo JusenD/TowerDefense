@@ -16,6 +16,7 @@ public:
     explicit healthBar(Enemy* enemy);
     explicit healthBar(Defender* defender);
     void paintEvent(QPaintEvent* event);
+    void timerEvent(QTimerEvent* event);
 
 signals:
 

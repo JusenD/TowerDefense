@@ -178,13 +178,6 @@ void Daida::move_once(){
                 animation4->start();
                 can_move = false;
                 QTimer::singleShot(1800, this, [=](){
-                    //保持血条的运动
-                    animation4->setDuration(999999);
-                    animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
-                    animation4->setEndValue(QRect(x_now+1, y_now- 20, this->width(), this->height()));
-                    animation4->setEasingCurve(QEasingCurve::InOutCubic);
-                    animation4->start();
- //                   stop_move();
                     can_move = false;
                     move_clk->stop();
                     attack_clk->start();
@@ -207,14 +200,6 @@ void Daida::move_once(){
                 animation4->setEndValue(QRect(x_now, y_now- 20, this->width(), this->height()));
                 animation4->setEasingCurve(QEasingCurve::InOutCubic);
                 animation4->start();
-                QTimer::singleShot(1800, this, [=](){
-                    //保持血条的运动
-                    animation4->setDuration(999999);
-                    animation4->setStartValue(QRect(x_now, y_now- 20, this->width(), this->height()));
-                    animation4->setEndValue(QRect(x_now+1, y_now- 20, this->width(), this->height()));
-                    animation4->setEasingCurve(QEasingCurve::InOutCubic);
-                    animation4->start();
-                });
             }
         }
     }

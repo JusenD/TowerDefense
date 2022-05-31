@@ -79,7 +79,6 @@ void Defender::health_decrease(int n, int time) {
 }
 
 void Defender::die() {
-    attack_clk->stop();
     this->place->delete_defender(this);
     delete_defender();
     this->health_bar->deleteLater();
@@ -171,23 +170,15 @@ void Boji::add(Block* place) {
     this->health_bar = new healthBar(this);
     health_bar->show();
     health_bar->move(5, 8);
-    qDebug() << place->x() << place->y();
     this->show();
-    attack_clk = new QTimer(this->gif);
-    connect(attack_clk, &QTimer::timeout, this->gif, [=]() {
-        this->gif->update();
-        });
-    attack_clk->start(100);
     //    this->attack();
 }
 
 void Boji::delete_now() {
-    attack_clk->stop();
     this->health_bar->deleteLater();
     if(detail_out) this->detail->deleteLater();
     this->place->delete_defender(this);
-    gif->deleteLater();
-    attack_clk->deleteLater();
+    gif->deleteLater();;
     this->deleteLater();
 }
 
