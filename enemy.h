@@ -16,11 +16,11 @@ class Enemy : public QWidget
     Q_OBJECT
 public:
     //枚举所有敌人种类
-    enum Enemies{Daida, Bat, Skeleton, BlackWitch, Bot};
+    enum Enemies{Daida, Bat, Skeleton, BlackWitch, Bot, Plus};
     //当前位置
     int x_now;
     int y_now;
-    Block* block_now;
+    Block* block_now = nullptr;
     //传入地图
     Map* map;
     //-1表示未进场
@@ -45,6 +45,7 @@ public:
     static void cut_off(QLabel* gif,QMovie* movie, int time);
     static bool on_delete;
     virtual void mouseReleaseEvent(QMouseEvent* event);
+    virtual void buff();
 protected:
     //设置生命值
     int original_health = 0;
@@ -68,6 +69,9 @@ protected:
     QPropertyAnimation* animation = nullptr;
     QPropertyAnimation* animation2 = nullptr;
     bool detail_out = false;
+    bool on_buff = false;
+    QLabel* buff_gif = nullptr;
+    QMovie* buff_movie = nullptr;
 };
 
 class Ground_Enemy:public Enemy{
@@ -152,6 +156,19 @@ public:
     void stop();
     void delete_now();
     Defender* find_target();
+};
+
+class Plus: public Ground_Enemy{
+    bool can_attack = false;
+public:
+    explicit Plus(QWidget *parent, int which_path, Map* map, int step = 0);
+    void start_move();
+    void move_once();
+    void attack();
+    void die();
+    void stop();
+    void delete_now();
+    void enable_attack();
 };
 
 #endif // ENEMY_H

@@ -3,6 +3,7 @@
 #include"map.h"
 #include"mainwindow.h"
 #include"selection.h"
+#include"enemy.h"
 #include<QMouseEvent>
 #include<QDebug>
 
@@ -105,8 +106,12 @@ void Block::push_a_defender(Defender* single_defender){
     this->all_defender.push_back(single_defender);
 }
 
+void Block::push_an_enemy(Enemy* single_enemy){
+    this->all_enemy.push_back(single_enemy);
+}
+
 void Block::delete_defender(Defender* defender){
-    std::vector<Defender*>::iterator itor;
+    std::list<Defender*>::iterator itor;
     for (itor = all_defender.begin(); itor != all_defender.end(); itor++)
         {
             if (*itor == defender)
@@ -117,8 +122,22 @@ void Block::delete_defender(Defender* defender){
         }
 }
 
-std::vector<Defender*>* Block::defender_in(){
+void Block::pop_enemy(Enemy* enemy){
+    std::list<Enemy*>::iterator itor;
+    for(itor = all_enemy.begin(); itor != all_enemy.end(); itor++){
+        if(*itor == enemy){
+            itor = all_enemy.erase(itor);
+            break;
+        }
+    }
+}
+
+std::list<Defender*>* Block::defender_in(){
     return &this->all_defender;
+}
+
+std::list<Enemy*>* Block::enemy_in(){
+    return &this->all_enemy;
 }
 
 bool Block::is_grass(){return grass;}

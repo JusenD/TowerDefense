@@ -107,5 +107,11 @@
         <file>res/BotWalk.gif</file>
         <file>res/bullet.png</file>
         <file>res/detail.png</file>
+        <file>res/PlusBuff.gif</file>
+        <file>res/PlusDead.gif</file>
+        <file>res/PlusWait.gif</file>
+        <file>res/PlusWalk.gif</file>
+        <file>res/on_buff.gif</file>
+        <file>res/on_buffing.gif</file>
     </qresource>
 </RCC>

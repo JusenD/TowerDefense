@@ -39,6 +39,33 @@ void Enemy::health_decrease(int n, int time){
     });
 }
 
+//buff
+void Enemy::buff(){
+    if(!on_buff){
+        this->damage *= 1.2;
+        this->health += 20;
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(0, 10);
+        buff_gif->setScaledContents(true);
+        buff_movie = new QMovie(":/res/on_buffing.gif");
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(5, 80);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
+    }
+}
+
 void Enemy::cut_off(QLabel* gif,QMovie* movie, int time){
     QTimer::singleShot(time, [=](){
         if(!on_delete){
@@ -152,7 +179,9 @@ void Daida::move_once(){
             return end();
         }
         else{
+            if(block_now) block_now->pop_enemy(this);
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
             animation->stop();
             animation1->stop();
             animation2->stop();
@@ -347,7 +376,9 @@ void Skeleton::move_once(){//3s完成线性的行走
             return end();
         }
         else{
+            if(block_now) block_now->pop_enemy(this);
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
             animation->stop();
             animation2->stop();
             //设置起始位置
@@ -524,7 +555,9 @@ void Bat::move_once(){//3s完成线性的行走
             return end();
         }
         else{
+            if(block_now) block_now->pop_enemy(this);
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
             animation->stop();
             animation2->stop();
             //设置起始位置
@@ -681,7 +714,7 @@ void BlackWitch::start_move(){
 
 void BlackWitch::move_once(){
     //游戏结束所有操作中断
-    if(unfinished){
+    if(unfinished){ 
         step++;
         if(step >= this_path->way.size()){
             can_move = false;
@@ -689,7 +722,9 @@ void BlackWitch::move_once(){
             return end();
         }
         else{
+            if(block_now) block_now->pop_enemy(this);
             block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
             animation->stop();
             animation2->stop();
             //设置起始位置
@@ -861,7 +896,9 @@ void Bot::move_once(){
             return end();
         }
         else{
+            if(block_now) block_now->pop_enemy(this);
             block_now = map->all_block[this_path->way[step].y * map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
             animation->stop();
             animation2->stop();
             //设置起始位置
@@ -921,13 +958,13 @@ void Bot::move_once(){
 
 Defender* Bot::find_target(){
     //搜索是否有可以攻击目标
-    if(!this->block_now->empty()) return (*(block_now->defender_in()))[0];
+    if(!this->block_now->empty()) return (*(block_now->defender_in())).front();
     for(int i = this_path->way[step].x - 1; i >= 0 && i >= this_path->way[step].x - 3; i--){
         for(int j = this_path->way[step].y - 1; j <= this_path->way[step].y + 1; j++){
             if(j < 0) continue;
-            if(j == map->get_colomn()) break;
-            if(!map->all_block[j * map->get_colomn() + i]->empty()){
-                return (*(map->all_block[j * map->get_colomn() + i]->defender_in()))[0];
+            if(j == map->get_row()) break;
+            if(!((*(map->all_block[j * map->get_colomn() + i]->defender_in())).empty())){
+                return (*(map->all_block[j * map->get_colomn() + i]->defender_in())).front();
             }
         }
     }
@@ -1080,6 +1117,182 @@ void Bot::delete_now(){
     gif->deleteLater();
 }
 
+//Buff法师
+Plus::Plus(QWidget *parent, int which_path, Map* map, int step){
+    this->setParent(parent);
+    this->parent = (MainWindow*)parent;
+    this->this_path = &(*map->path)[which_path];
+    this->step = step-1;
+    this->resize(70, 100);
+    this->map = map;
+    x_now = this_path->way[step].x*70 + 70;
+    y_now = this_path->way[step].y*70;
+    this->move(x_now, y_now);
+    this->health = 200;
+    this->original_health = health;
+    //初始化gif
+    gif = new QLabel;
+    gif->setParent(parent);
+    gif->resize(160, 100);
+    gif->setAttribute(Qt::WA_TransparentForMouseEvents);
+    gif->setScaledContents(true);
+    gif->hide();
+    gif->move(x_now, y_now);
+    movie = new QMovie(":/res/PlusWalk.gif");
+    //初始化血条
+    this->health_bar = new healthBar(this);
+    health_bar->move(17, 5);
+    this->damage = 0;
+    this->original_damage = damage;
+    //初始化animation
+    animation = new QPropertyAnimation(this, "geometry");
+    animation2 = new QPropertyAnimation(gif, "geometry");
+    //初始化时钟
+    move_clk = new QTimer(this);
+    attack_clk = new QTimer(this);
+    //每隔8s走一步，40s叠Buff一次
+    move_clk->setInterval(8000);
+    attack_clk->setInterval(30000);
+    connect(move_clk, &QTimer::timeout, this, &Plus::move_once);
+    connect(attack_clk, &QTimer::timeout, this, &Plus::enable_attack);
+}
+
+void Plus::start_move(){
+    health_bar->show();
+    move_once();
+    move_clk->start();
+    attack_clk->start();
+}
+
+void Plus::move_once(){//8s完成线性的行走
+    //游戏结束所有操作中断
+    if(unfinished){
+        QMovie* former = movie;
+        movie = new QMovie(":/res/PlusWalk.gif");
+        former->deleteLater();
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
+        step++;
+        if(step >= this_path->way.size()){
+            can_move = false;
+    //        defeat();
+            return end();
+        }
+        else{
+            animation->stop();
+            animation2->stop();
+            if(can_attack){
+                step--;
+                move_clk->stop();
+                return attack();
+            }
+            if(block_now) block_now->pop_enemy(this);
+            block_now = map->all_block[this_path->way[step].y * this->parent->the_map->get_colomn() + this_path->way[step].x];
+            block_now->push_an_enemy(this);
+            //设置起始位置
+            animation->setStartValue(QRect(x_now, y_now, this->width(), this->height()));
+            animation2->setStartValue(QRect(x_now-20, y_now-35, gif->width(), gif->height()));
+            //设置终止位置
+            //设置时间间隔
+            animation->setDuration(5000);
+            animation2->setDuration(8000);
+            x_now = this_path->way[step].x*70;
+            y_now = this_path->way[step].y*70;
+            //设置结束位置
+            animation->setEndValue(QRect(x_now, y_now, this->width(), this->height()));
+            animation->setEasingCurve(QEasingCurve::Linear);
+            animation->start();
+            animation2->setEndValue(QRect(x_now-20, y_now-35, gif->width(), gif->height()));
+            animation2->setEasingCurve(QEasingCurve::Linear);
+            animation2->start();
+        }
+    }
+}
+
+void Plus::enable_attack(){
+    this->can_attack = true;
+}
+
+void Plus::attack(){
+    //游戏结束所有操作中断
+    if(unfinished){
+        move_clk->stop();
+        attack_clk->stop();
+        QMovie* former = movie;
+        movie = new QMovie(":/res/PlusWait.gif");
+        former->deleteLater();
+        gif->setMovie(movie);
+        movie->start();
+        gif->show();
+        QTimer::singleShot(2000, this, [=](){
+            QMovie* former = movie;
+            movie = new QMovie(":/res/PlusBuff.gif");
+            former->deleteLater();
+            gif->setMovie(movie);
+            movie->start();
+            gif->show();
+            QTimer::singleShot(1800, this, [=](){
+                for(int i = step+1;i < this_path->way.size()-1 && i <= step + 5; i++){
+                    for(auto enemy : *(map->all_block[this_path->way[i].y * this->parent->the_map->get_colomn() + this_path->way[i].x]->enemy_in())){
+                        enemy->buff();
+                    }
+                }
+            });
+            QTimer::singleShot(2500, this, [=](){
+                QMovie* former = movie;
+                movie = new QMovie(":/res/PlusWait.gif");
+                former->deleteLater();
+                gif->setMovie(movie);
+                movie->start();
+                gif->show();
+                attack_clk->start();
+            });
+            QTimer::singleShot(5000, this, [=](){
+                move_clk->start();
+                can_attack = false;
+                move_once();
+            });
+        });
+    }
+}
+
+void Plus::die(){
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    if(detail_out){detail->disappear();}
+    delete_enemy();
+    QMovie* former = movie;
+    movie = new QMovie(":/res/PlusDead.gif");
+    former->deleteLater();
+    movie->start();
+    gif->resize(100, 190);
+    gif->move(gif->x() + 25, gif->y() - 90);
+    gif->setMovie(movie);
+    gif->show();
+    cut_off(gif,movie, 1600);
+    this->deleteLater();
+}
+
+void Plus::delete_now() {
+    move_clk->stop();
+    attack_clk->stop();
+    can_move = false;
+    animation->stop();
+    animation2->stop();
+    animation->deleteLater();
+    animation2->deleteLater();
+    this->health_bar->deleteLater();
+    if(detail_out){detail->deleteLater();}
+    movie->deleteLater();
+    gif->deleteLater();
+}
 
 
 

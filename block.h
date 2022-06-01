@@ -7,6 +7,7 @@
 #include<QLabel>
 
 class Map;
+class Enemy;
 class Block : public QWidget
 {
     Q_OBJECT
@@ -15,10 +16,13 @@ public:
     explicit Block(QWidget *parent, int colomn_now, int row_now);
     bool add_defender(Defender* single_defender);
     void push_a_defender(Defender* single_defender);
-    std::vector<Defender*>* defender_in();
+    void push_an_enemy(Enemy* single_enemy);
+    std::list<Defender*>* defender_in();
+    std::list<Enemy*>* enemy_in();
     QLabel *coming_picture;
     bool empty();
     void delete_defender(Defender* defender);
+    void pop_enemy(Enemy* enemy);
     void mouseReleaseEvent(QMouseEvent *ev);
     void enterEvent(QEvent *evnet);
     void leaveEvent(QEvent *event);
@@ -28,7 +32,8 @@ public:
 protected:
     QString type = "";
     QWidget* parent;
-    std::vector<Defender*> all_defender; 
+    std::list<Defender*> all_defender;
+    std::list<Enemy*> all_enemy;
     bool grass = false;
     Map* the_map = nullptr;
     int row_now = 0;

@@ -13,6 +13,9 @@ Waves::Waves(Map* the_map)
             int random_enemy = rand() % max_level_enemy;
             int random_path = rand() % the_map->path->size();
             the_map->add_enemy(the_map->parent, random_path, random_enemy);
+            //测试Bot
+            the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Bot);
+            the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
             now++;
         }
     });
@@ -51,15 +54,22 @@ void Waves::stategy(){
             });
         });
     });
+    QTimer::singleShot(50000, this->clk, [=](){
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
+    });
     QTimer::singleShot(100000, this->clk, [=](){
-        the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Bot);
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
     });
     QTimer::singleShot(165000, this->clk, [=](){
-        the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
+        the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Bot);
         QTimer::singleShot(1000, this->clk, [=](){
-            the_map->add_enemy(the_map->parent, 1, Enemy::Bot);
+            the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Bot);
             QTimer::singleShot(1000, this->clk, [=](){
-                the_map->add_enemy(the_map->parent, 0, Enemy::Bot);
+                the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Plus);
+                the_map->add_enemy(the_map->parent, rand()%the_map->path->size(), Enemy::Bot);
             });
         });
     });
