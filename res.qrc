@@ -112,6 +112,7 @@
         <file>res/PlusWait.gif</file>
         <file>res/PlusWalk.gif</file>
         <file>res/on_buff.gif</file>
-        <file>res/on_buffing.gif</file>
+        <file>res/on_buffing1.gif</file>
+        <file>res/on_buffing2.gif</file>
     </qresource>
 </RCC>

@@ -123,13 +123,14 @@ void Block::delete_defender(Defender* defender){
 }
 
 void Block::pop_enemy(Enemy* enemy){
-    std::list<Enemy*>::iterator itor;
-    for(itor = all_enemy.begin(); itor != all_enemy.end(); itor++){
-        if(*itor == enemy){
-            itor = all_enemy.erase(itor);
-            break;
-        }
-    }
+    all_enemy.remove(enemy);
+//    std::list<Enemy*>::iterator itor;
+//    for(itor = all_enemy.begin(); itor != all_enemy.end(); itor++){
+//        if(*itor == enemy){
+//            itor = all_enemy.erase(itor);
+//            break;
+//        }
+//    }
 }
 
 std::list<Defender*>* Block::defender_in(){

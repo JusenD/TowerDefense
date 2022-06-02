@@ -31,12 +31,13 @@ Detail::Detail(QWidget *parent,int x, int y, int* health, int* damage, int origi
     detail_animation2 = new QPropertyAnimation(this, "geometry");
 }
 
-Detail::Detail(QWidget *parent, QLabel* follow, int* health, int* damage, int original_health, int original_damage) : QLabel(parent)
+Detail::Detail(QWidget *parent, QLabel* follow, int* health, int* damage, int original_health, int original_damage, bool PLUS) : QLabel(parent)
 {
     this->setFixedSize(200, 25);
-    attach_x = follow->x() + follow->width() - 70 - 65;
+    attach_x = PLUS ? follow->x() + follow->width() - 70 - 65 - 70 : follow->x() + follow->width() - 70 - 65;
     attach_y = follow->y() + follow->height();
     is_enemy = true;
+    special_PLUS = PLUS;
     this->follow = follow;
     this->health = health;
     this->original_health = original_health;
@@ -107,7 +108,7 @@ void Detail::timerEvent(QTimerEvent* event){
         health_text->setText((std::to_string(*health).append("/").append(std::to_string(this->original_health))).c_str());
         damage_text->setText((std::to_string(*damage).append("/").append(std::to_string(this->original_damage))).c_str());
         if(is_enemy){
-            attach_x = follow->x() + follow->width() - 70 - 65;
+            attach_x = special_PLUS ? follow->x() + follow->width() - 70 - 65 - 70 : follow->x() + follow->width() - 70 - 65;
             attach_y = follow->y() + (follow->height());
             this->move(attach_x, attach_y);
         }

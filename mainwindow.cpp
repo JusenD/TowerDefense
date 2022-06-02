@@ -74,8 +74,6 @@ MainWindow::MainWindow(int which_map, QWidget *parent)
 ////    BlackWitch* a_blackWitch = new BlackWitch(this, 2, the_map);
 ////    a_blackWitch->start_move();
 //    the_map->add_enemy(this, 2, Enemy::BlackWitch);
-    //尝试添加buff法师
-    the_map->add_enemy(this, 0, Enemy::Plus);
 
     //添加波吉 selection
     Selection *boji = new Selection(this, Defender::Boji);

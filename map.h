@@ -56,7 +56,7 @@ public:
     vector<Enemy*> all_enemy;
     vector<Defender*> all_defender;
     vector<Block*> all_block;
-    void add_enemy(QWidget *parent, int which_path, int who, int step = 0);
+    Enemy* add_enemy(QWidget *parent, int which_path, int who, int step = 0);
     void add_defender(Block* where, Defender* single_defender);
     int *array;
     void defeat();

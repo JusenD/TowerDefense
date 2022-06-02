@@ -212,7 +212,7 @@ int Map::get_colomn(){return colomn;}
 int Map::get_row(){return row;}
 
 //添加敌方单位
-void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
+Enemy* Map::add_enemy(QWidget *parent, int which_path, int who, int step){
     if(have_not_end && which_path < (*this->path).size() && (step < (*this->path)[which_path].way.size())){
         Enemy* a_enemy = nullptr;
         switch (who) {
@@ -240,8 +240,10 @@ void Map::add_enemy(QWidget *parent, int which_path, int who, int step){
             a_enemy->show();
             a_enemy->start_move();
             this->all_enemy.push_back(a_enemy);
+            return a_enemy;
         }
         else a_enemy->delete_now();
+        return nullptr;
     }
 }
 

@@ -111,6 +111,7 @@ public:
     void start_move();
     void move_once();
     void attack();
+    void buff();
     void die();
     void stop();
     void delete_now();
@@ -122,6 +123,7 @@ public:
     void start_move();
     void move_once();
     void attack();
+    void buff();
     void die();
     void stop();
     void delete_now();
@@ -133,6 +135,7 @@ public:
     void start_move();
     void move_once();
     void attack();
+    void buff();
     void start_call();
     void die();
     void stop();
@@ -151,6 +154,7 @@ public:
     void start_move();
     void move_once();
     void attack();
+    void buff();
     void health_decrease(int, int);
     void die();
     void stop();
@@ -165,10 +169,12 @@ public:
     void start_move();
     void move_once();
     void attack();
+    void buff();
     void die();
     void stop();
     void delete_now();
     void enable_attack();
+    void mouseReleaseEvent(QMouseEvent* event);
 };
 
 #endif // ENEMY_H

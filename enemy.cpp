@@ -15,6 +15,7 @@ bool Enemy::all_enemy_access = true;
 void Enemy::delete_enemy(){
     if(all_enemy_access){
         all_enemy_access = false;
+        if(block_now) block_now->pop_enemy(this);
         vector<Enemy*>::iterator itor = map->all_enemy.begin();
         for(itor = map->all_enemy.begin(); itor != map->all_enemy.end(); itor++){
             if(*itor == this){
@@ -42,14 +43,20 @@ void Enemy::health_decrease(int n, int time){
 //buff
 void Enemy::buff(){
     if(!on_buff){
-        this->damage *= 1.2;
-        this->health += 20;
         on_buff = true;
         buff_gif = new QLabel(gif);
         buff_gif->resize(60, 90);
         buff_gif->move(0, 10);
         buff_gif->setScaledContents(true);
-        buff_movie = new QMovie(":/res/on_buffing.gif");
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
         buff_movie->start();
         buff_gif->setMovie(buff_movie);
         buff_gif->show();
@@ -460,6 +467,38 @@ void Skeleton::attack(){
     }
 }
 
+void Skeleton::buff(){
+    if(!on_buff){
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(60, 15);
+        buff_gif->setScaledContents(true);
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(65, 85);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
+    }
+}
+
 void Skeleton::die(){
     move_clk->stop();
     attack_clk->stop();
@@ -630,6 +669,38 @@ void Bat::attack(){
     }
 }
 
+void Bat::buff(){
+    if(!on_buff){
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(15, 10);
+        buff_gif->setScaledContents(true);
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(15, 60);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
+    }
+}
+
 void Bat::die(){
     move_clk->stop();
     attack_clk->stop();
@@ -783,6 +854,38 @@ void runaaaa(QLabel* gif, int time){
     QTimer::singleShot(time, [=](){
         run_away->start();
     });
+}
+
+void BlackWitch::buff(){
+    if(!on_buff){
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(0, 10);
+        buff_gif->setScaledContents(true);
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(5, 50);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
+    }
 }
 
 void BlackWitch::die(){
@@ -1013,6 +1116,38 @@ void Bot::attack(){
                 gif->show();
             });
         }
+    }
+}
+
+void Bot::buff(){
+    if(!on_buff){
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(220, 0);
+        buff_gif->setScaledContents(true);
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(225, 50);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
     }
 }
 
@@ -1257,6 +1392,38 @@ void Plus::attack(){
     }
 }
 
+void Plus::buff(){
+    if(!on_buff){
+        on_buff = true;
+        buff_gif = new QLabel(gif);
+        buff_gif->resize(60, 90);
+        buff_gif->move(25, 10);
+        buff_gif->setScaledContents(true);
+        //随机buff 0为水之呼吸，1为雷之呼吸
+        if(std::rand() % 2){
+            this->health += 40;
+            buff_movie = new QMovie(":/res/on_buffing1.gif");
+        }
+        else{
+            this->damage *= 1.4;
+            buff_movie = new QMovie(":/res/on_buffing2.gif");
+        }
+        buff_movie->start();
+        buff_gif->setMovie(buff_movie);
+        buff_gif->show();
+        QTimer::singleShot(800, this, [=](){
+            QMovie* former = buff_movie;
+            buff_movie = new QMovie(":/res/on_buff.gif");
+            former->deleteLater();
+            buff_gif->resize(60, 20);
+            buff_gif->move(30, 80);
+            buff_movie->start();
+            buff_gif->setMovie(buff_movie);
+            buff_gif->show();
+        });
+    }
+}
+
 void Plus::die(){
     move_clk->stop();
     attack_clk->stop();
@@ -1292,6 +1459,20 @@ void Plus::delete_now() {
     if(detail_out){detail->deleteLater();}
     movie->deleteLater();
     gif->deleteLater();
+}
+
+void Plus::mouseReleaseEvent(QMouseEvent* event) {
+    if(!detail_out){
+        detail = new Detail(parent, this->get_gif(), &this->health, &this->damage, this->original_health, this->original_damage, true);
+        detail->appear();
+        detail_out = true;
+        grabMouse();
+    }
+    else {
+        detail->disappear();
+        detail_out = false;
+        releaseMouse();
+    }
 }
 
 
