@@ -146,7 +146,6 @@ Boji::Boji(QWidget* parent)
     this->original_damage = damage;
     this->cost = 100;
     this->fighter = true;
-    //   this->move(place->x(), place->y());
 }
 
 void Boji::paintEvent(QPaintEvent*) {
@@ -171,7 +170,6 @@ void Boji::add(Block* place) {
     health_bar->show();
     health_bar->move(5, 8);
     this->show();
-    //    this->attack();
 }
 
 void Boji::delete_now() {
@@ -182,64 +180,9 @@ void Boji::delete_now() {
     this->deleteLater();
 }
 
-////攻击
-//void Boji::attack(){
-//    vector<Enemy*>* all_enemy = &((MainWindow*)(this->parent))->the_map->all_enemy;
-//    bool whether = false;
-//    //范围伤害
-//    for(int i = 0; i < all_enemy->size(); i++){
-//        if((*all_enemy)[i]->block_now == this->place){
-//            if((*all_enemy)[i]->is_ground()){
-//                (*all_enemy)[i]->health_decrease(damage, 260);
-//                whether = true;
-//            }
-//        }
-//    }
-//    //设置攻击频率 为2s一次
-//    if(whether){
-//        //执行攻击动画
-//        QPropertyAnimation *animation1 = new QPropertyAnimation(this, "geometry");
-//        //设置时间间隔
-//        animation1->setDuration(250);
-//        //设置起始位置
-//        animation1->setStartValue(QRect(place->x(), place->y(), this->width(), this->height()));
-//        //设置结束位置
-//        animation1->setEndValue(QRect(place->x() + 4, place->y() - 7, this->width(), this->height()));
-//        animation1->setEasingCurve(QEasingCurve::InOutCubic);
-//        animation1->start();
-//        QTimer::singleShot(250, this, [=](){
-//            QPropertyAnimation *animation2 = new QPropertyAnimation(this, "geometry");
-//            //设置时间间隔
-//            animation2->setDuration(150);
-//            //设置起始位置
-//            animation2->setStartValue(QRect(place->x() + 4, place->y() - 7, this->width(), this->height()));
-//            //设置结束位置
-//            animation2->setEndValue(QRect(place->x() + 7, place->y(), this->width(), this->height()));
-//            animation2->setEasingCurve(QEasingCurve::InOutCubic);
-//            animation2->start();
-//            QTimer::singleShot(150, this, [=](){
-//                QPropertyAnimation *animation3 = new QPropertyAnimation(this, "geometry");
-//                //设置时间间隔
-//                animation3->setDuration(150);
-//                //设置起始位置
-//                animation3->setStartValue(QRect(place->x() + 7, place->y(), this->width(), this->height()));
-//                //设置结束位置
-//                animation3->setEndValue(QRect(place->x(), place->y(), this->width(), this->height()));
-//                animation3->setEasingCurve(QEasingCurve::InOutCubic);
-//                animation3->start();
-//            });
-//        });
-//    }
-//    //递归调用
-//    QTimer::singleShot(2000, this, [=](){
-//        attack();
-//    });
-//}
-
 Witch::Witch(QWidget* parent)
     : Defender{ parent }
 {
-    //    this->place = place;
     this->parent = parent;
     this->resize(70, 70);
     this->health = 100;
@@ -249,7 +192,6 @@ Witch::Witch(QWidget* parent)
     this->cost = 200;
     this->range = 300;
     this->fighter = false;
-    //   this->move(place->x(), place->y());
 }
 
 

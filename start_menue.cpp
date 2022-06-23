@@ -100,7 +100,7 @@ void Start_menue::paintEvent(QPaintEvent* event){
     QPainter painter(this);
     QPixmap pix;
     QString randpic = ":/res/start/start";
-    randpic.append(to_string(rand()%8).c_str()).append(".png");
+    randpic.append(to_string(rand()%7).c_str()).append(".png");
     pix.load(randpic);
     painter.drawPixmap(0, 0, 750, 750, pix);
 }

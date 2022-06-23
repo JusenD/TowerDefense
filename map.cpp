@@ -109,23 +109,6 @@ Map::Map(QWidget* parent, int num){
                 all_block.push_back(a_grass);
                 continue;
             }
-//            //将路径图编码，对不同情况画不同图片
-//            int x = 0;
-//            //处理路径四个角
-//            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j>1&&array[i*colomn + j - 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j-1] == 1)){
-//                x+=1000;
-//            }
-//            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i>0&&array[(i-1)*colomn + j] == 1))&&!(i>0&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i-1)*colomn + j] == 1&&array[(i-1)*colomn + j+1] == 1)){
-//                x+=100;
-//            }
-//            if(array[i*colomn + j]&&((j>1 && array[i*colomn + j - 1] == 1) || (i<row-1&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j>1&&array[i*colomn + j - 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j-1] == 1)){
-//                x+=10;
-//            }
-//            if(array[i*colomn + j]&&((j<colomn-1 && array[i*colomn + j + 1] == 1) || (i<row&&array[(i+1)*colomn + j] == 1))&&!(i<row-1&&j<colomn-1&&array[i*colomn + j + 1] == 1&&array[(i+1)*colomn + j] == 1&&array[(i+1)*colomn + j+1] == 1)){
-//                x+=1;
-//            }
-                                    //画路径
- //           Road* a_road = new Road(parent, j*70, i*70, x);
             Road* a_road = new Road(parent, j, i, 0);
             a_road->show();
             all_block.push_back(a_road);

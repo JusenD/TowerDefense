@@ -39,41 +39,6 @@ MainWindow::MainWindow(int which_map, QWidget *parent)
     });
     source_health_clk->start(100);
     ui->menu->move(0, 70*the_map->get_row());
-//    //添加一个敌人
-//    the_map->add_enemy(this, 1, Enemy::Daida);
-
-//    //再添加一堆敌人
-
-//    QTimer::singleShot(1000, this, [=](){
-//        //the_map->add_enemy(this, 0, Enemy::Bat);
-//    });
-//    QTimer::singleShot(2000, this, [=](){
-//        the_map->add_enemy(this, 1, Enemy::Skeleton);
-//    });
-//    QTimer::singleShot(3000, this, [=](){
-//        //the_map->add_enemy(this, 0, Enemy::Bat);
-//    });
-//    QTimer::singleShot(4000, this, [=](){
-//        the_map->add_enemy(this, 1, Enemy::Daida);
-//    });
-//    QTimer::singleShot(5000, this, [=](){
-//        //the_map->add_enemy(this, 0, Enemy::Daida);
-//    });
-//    //尝试添加一个骷髅兵
-////    Daida* a_daida = new Daida(this, &(*the_map->path)[0], the_map);
-////    a_daida->start_move();
-////    Skeleton* a_skeleton = new Skeleton(this, &(*the_map->path)[0], the_map);
-////    a_skeleton->start_move();
-//    the_map->add_enemy(this, 0, Enemy::Daida);
-
-////    //尝试添加一个蝙蝠
-////    Bat* a_bat = new Bat(this, &(*the_map->path)[0], the_map);
-////    a_bat->start_move();
-//   // the_map->add_enemy(this, 0, Enemy::Bat);
-//    //尝试添加黑法师
-////    BlackWitch* a_blackWitch = new BlackWitch(this, 2, the_map);
-////    a_blackWitch->start_move();
-//    the_map->add_enemy(this, 2, Enemy::BlackWitch);
 
     //添加波吉 selection
     Selection *boji = new Selection(this, Defender::Boji);
@@ -100,31 +65,10 @@ MainWindow::MainWindow(int which_map, QWidget *parent)
     king->move(590, 70*the_map->get_row() + 5);
     king->show();
 
-    //尝试添加King
-//    King* a_soildier = new King(this);
-//    a_soildier->move(the_map->all_block[10]->x(), the_map->all_block[10]->y());
-//    a_soildier->setTarget(the_map->all_block[25]);
-//    the_map->add_defender(the_map->all_block[40], a_soildier);
-
-//    QPixmap pix;
-//    pix.load(":/res/spade_selection.png");
-//    //设置图片固定大小
-//    ui->spadeButton->setFixedSize(81, 81);
-//    //设置不规则图片样式
-//    ui->spadeButton->setStyleSheet("QPushButton{border:0px;}");
-//    //设置图标
-//    ui->spadeButton->setIcon(pix);
-//    //设置图标大小
-//    ui->spadeButton->setIconSize(QSize(81, 81));
    //添加铲子 selection
     Selection *spade_selection = new Spade_Selection(this);
     spade_selection->move(960-1, 70*the_map->get_row() + 9);
     spade_selection->show();
-
-//    int x = 5, y = 10;
-//    Detail* try_detail = new Detail(this, &x, &y);
-//   try_detail->move(100, 100);
-//   try_detail->show();
 }
 
 void MainWindow::paintEvent(QPaintEvent*){
@@ -194,14 +138,6 @@ void MainWindow::set_select(Defender* selected, QString coming, Selection* selec
     this->select_selection = selec_selection;
     this->coming = coming;
 }
-
-//void MainWindow::mouseMoveEvent(QMouseEvent* ev){
-//    qDebug()<<"鼠标移动了！";
-//    if(spade){
-//        spade->move(ev->x(), ev->y());
-//        qDebug()<<ev->x()<<ev->y();
-//    }
-//}
 
 //追踪鼠标位置移动铲子
 bool MainWindow::eventFilter(QObject* object, QEvent* event){
